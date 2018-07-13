@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Player.h"
+#include "Map.h"
+#include <iostream>
 
 class Game
 {
@@ -27,5 +29,7 @@ private:
 	sf::View *m_pCurrentView = nullptr;
 
 	std::string m_WindowTitle = "Game";
+
+	Map* m_pMap = nullptr;
 };
 

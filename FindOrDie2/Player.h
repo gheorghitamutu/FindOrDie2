@@ -18,7 +18,7 @@ private:
 	sf::Sprite m_Body;
 	static constexpr float m_TextureSize = 80.0f;
 	sf::Vector2f m_Direction = { 0, 0 };
-	static constexpr float m_DefaultSpeed = 30.0f;
+	static constexpr float m_DefaultSpeed = 80.0f;
 	static constexpr float m_WalkingSpeed = 1.1f;
 	bool m_IsFocused = false;
 

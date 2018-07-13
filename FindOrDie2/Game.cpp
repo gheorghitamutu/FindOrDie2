@@ -14,6 +14,9 @@ Game::Game()
 	InputManager::GetInstance()->AddAction(InputKeys::Right, sf::Keyboard::Key::Right);
 	InputManager::GetInstance()->AddAction(InputKeys::C, sf::Keyboard::Key::C);
 
+	m_pMap = Map::GetInstance();
+	m_pMap->GenerateMap();
+
 	m_pPlayer = new Player();
 
 	m_pDefaultView = new sf::View();
@@ -37,6 +40,7 @@ Game::~Game()
 	m_pDefaultView = nullptr;
 
 	ResourceManager::GetInstance()->CleanUp();
+	Map::GetInstance()->CleanUp();
 }
 
 void Game::Run()
@@ -49,6 +53,10 @@ void Game::Run()
 	{
 		// calculate time between events
 		deltaTime = clock.restart().asSeconds();
+
+		// check fps
+		float fps = 1.0f / deltaTime;
+		std::cout << "\r" << fps ;
 		
 		// check events
 		isRunning = ProcessEvents();
@@ -95,6 +103,7 @@ void Game::Draw()
 	// m_pWindow->setView(m_pWindow->getDefaultView()); // reset camera view
 
 	// draw stuff
+	m_pMap->Draw(m_pWindow);
 	m_pPlayer->Draw(m_pWindow);
 
 	m_pWindow->display();

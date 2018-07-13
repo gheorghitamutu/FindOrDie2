@@ -33,10 +33,10 @@ public:
 	void AddAction(int id, sf::Keyboard::Key key);
 	bool IsActionTriggered(int id);
 
-	bool IsButtonPressed(WORD button); // controller
+	bool IsButtonPressed(WORD button); // controller button
 
-	sf::Vector2f GetThumbStickLeft();
-	sf::Vector2f GetThumbStickRight();
+	sf::Vector2f GetThumbStickLeft(); // controller thumb
+	sf::Vector2f GetThumbStickRight(); // controller thumb
 private:
 	std::map<int, sf::Keyboard::Key> m_Actions;
 

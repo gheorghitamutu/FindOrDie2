@@ -1,6 +1,7 @@
 #pragma once
 #include "SFML/Graphics.hpp"
-
+#include <vector>
+#include "ResourceManager.h"
 
 class Map
 {
@@ -14,5 +15,15 @@ public:
 		return &instance;
 	}
 	~Map();
+
+	void CleanUp();
+	void GenerateMap();
+	void Draw(sf::RenderWindow* pWindow);
+
+public:
+	static const unsigned int tileSize = 64;
+
+private:
+	std::vector<sf::Sprite*> m_Tiles;
 };
 

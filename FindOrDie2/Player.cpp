@@ -5,7 +5,7 @@
 Player::Player()
 {
 	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
-	m_Body.setScale({ 2.4f, 2.4f });
+	m_Body.setScale({ 1.0f, 1.0f });
 	m_Body.setPosition({ 0.0f, 0.0f });
 
 	auto textureRequired = ResourceManager::GetInstance()->RequestTexture("Player_Man");
