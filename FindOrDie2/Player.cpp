@@ -6,7 +6,19 @@ Player::Player()
 {
 	m_Body.setSize({ 100.0f, 100.0f });
 	m_Body.setPosition({ 0.0f, 0.0f });
-	m_Body.setTexture(ResourceManager::GetInstance()->RequestTexture("Ghost"));
+
+	auto textureRequired = ResourceManager::GetInstance()->RequestTexture("Player_Man");
+	
+	for (int i = 0; i < int(AnimationIndex::Count); i++)
+	{
+		m_Animations[i] = 
+			Animation(
+				(int)m_TextureSize, 
+				(int)(i*m_TextureSize), 
+				(int)m_TextureSize, 
+				(int)m_TextureSize, 
+				textureRequired);
+	}
 }
 
 
@@ -18,31 +30,40 @@ void Player::Update(float elapsedSec)
 {
 	auto input = InputManager::GetInstance();
 	auto pos = m_Body.getPosition();
-
-	sf::Vector2<float> velocity;
-	float speed = 200.0f;
+	m_Direction = { 0, 0 };
 
 	if (input->IsActionTriggered(InputKeys::Up))
 	{
-		velocity.y = -speed;
+		m_Direction.y = -1;
 	}
 	if (input->IsActionTriggered(InputKeys::Down))
 	{
-		velocity.y = speed;
+		m_Direction.y = 1;
 	}
 	if (input->IsActionTriggered(InputKeys::Left))
 	{
-		velocity.x = -speed;
+		m_Direction.x = -1;
 	}
 	if (input->IsActionTriggered(InputKeys::Right))
 	{
-		velocity.x = speed;
+		m_Direction.x = 1;
 	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
+	{
+		m_Direction.x *= 2;
+		m_Direction.y *= 2;
+	}
+
+	SetAnimationFrame();
 
 	// auto thumbstickState = InputManager::GetInstance()->GetThumbStickLeft;  // controller
 	// pos += thumbstickState * speed * elapsedSec;							   // controller
 
-	pos += velocity * elapsedSec;
+	pos += m_Direction * m_DefaultSpeed * elapsedSec;
+
+	m_Animations[int(m_CurrentAnimation)].Update(elapsedSec);
+	m_Animations[int(m_CurrentAnimation)].ApplyToSprite(&m_Body);
 
 	m_Body.setPosition(pos);
 }
@@ -55,4 +76,103 @@ void Player::Draw(sf::RenderWindow* pWindow)
 sf::Vector2f Player::GetPosition() const
 {
 	return m_Body.getPosition();
+}
+
+void Player::SetAnimationFrame()
+{
+	if (m_Direction.x == 0.0f && m_Direction.y > 0.0f)
+	{
+		if (m_Direction.y > m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningSouth;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingSouth;
+	}
+	else if (m_Direction.x > 0.0f && m_Direction.y > 0.0f)
+	{
+		if (m_Direction.x > m_WalkingSpeed && m_Direction.y > m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningSouthEast;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingSouthEast;
+	}
+	else if (m_Direction.x > 0.0f && m_Direction.y == 0.0f)
+	{
+		if (m_Direction.x > m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningEast;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingEast;
+	}
+	else if (m_Direction.x < 0.0f && m_Direction.y > 0.0f)
+	{
+		if (m_Direction.x < -m_WalkingSpeed && m_Direction.y > m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningSouthWest;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingSouthWest;
+
+	}
+	else if (m_Direction.x < 0.0f && m_Direction.y == 0.0f)
+	{
+		if (m_Direction.x < -m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningWest;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingWest;
+	}
+	else if (m_Direction.x < 0.0f && m_Direction.y < 0.0f)
+	{
+		if (m_Direction.x < -m_WalkingSpeed && m_Direction.y < -m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningNorthWest;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingNorthWest;
+	}
+	else if (m_Direction.x == 0.0f && m_Direction.y < 0.0f)
+	{
+		if (m_Direction.y < -m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningNorth;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingNorth;
+	}
+	else if (m_Direction.x > 0.0f && m_Direction.y < 0.0f)
+	{
+		if (m_Direction.x > m_WalkingSpeed && m_Direction.y < -m_WalkingSpeed)
+			m_CurrentAnimation = AnimationIndex::RunningNorthEast;
+		else
+			m_CurrentAnimation = AnimationIndex::WalkingNorthEast;
+	}
+	else
+	{
+		switch (m_CurrentAnimation)
+		{
+			case AnimationIndex::WalkingSouth:
+			case AnimationIndex::RunningSouth:
+				m_CurrentAnimation = AnimationIndex::IdleSouth;
+				break;
+			case AnimationIndex::WalkingNorth:
+			case AnimationIndex::RunningNorth:
+				m_CurrentAnimation = AnimationIndex::IdleNorth;
+				break;
+			case AnimationIndex::WalkingEast:
+			case AnimationIndex::RunningEast:
+				m_CurrentAnimation = AnimationIndex::IdleEast;
+				break;
+			case AnimationIndex::WalkingWest:
+			case AnimationIndex::RunningWest:
+				m_CurrentAnimation = AnimationIndex::IdleWest;
+				break;
+			case AnimationIndex::WalkingSouthEast:
+			case AnimationIndex::RunningSouthEast:
+				m_CurrentAnimation = AnimationIndex::IdleSouthEast;
+				break;
+			case AnimationIndex::WalkingNorthEast:
+			case AnimationIndex::RunningNorthEast:
+				m_CurrentAnimation = AnimationIndex::IdleNorthEast;
+				break;
+			case AnimationIndex::WalkingSouthWest:
+			case AnimationIndex::RunningSouthWest:
+				m_CurrentAnimation = AnimationIndex::IdleNorthWest;
+				break;
+			case AnimationIndex::WalkingNorthWest:
+			case AnimationIndex::RunningNorthWest:
+				m_CurrentAnimation = AnimationIndex::IdleNorthWest;
+				break;
+		};
+	}
 }

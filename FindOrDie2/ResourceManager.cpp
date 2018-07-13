@@ -5,6 +5,7 @@
 ResourceManager::ResourceManager()
 {
 	LoadTexture("Resources/Sprites/ghost.png", "Ghost");
+	LoadTexture("Resources/Sprites/Player_Man/man.png", "Player_Man");
 }
 
 void ResourceManager::LoadTexture(std::string path, std::string name)
