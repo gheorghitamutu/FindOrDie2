@@ -1,6 +1,6 @@
 #pragma once
 #include <SFML/Graphics.hpp>
-
+#include "Player.h"
 
 class Game
 {
@@ -16,6 +16,9 @@ private:
 
 private:
 	sf::RenderWindow* m_pWindow = nullptr;
-	sf::RectangleShape m_Rect;
+
+	Player* m_pPlayer = nullptr;
+
+	sf::View m_View;
 };
 

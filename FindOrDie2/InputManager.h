@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+#include<Windows.h>
+#include<Xinput.h>
 
 enum InputKeys
 {
@@ -23,10 +25,18 @@ public:
 	}
 	~InputManager();
 
+	void Update();
+
 	void AddAction(int id, sf::Keyboard::Key key);
 	bool IsActionTriggered(int id);
 
+	bool IsButtonPressed(WORD button); // controller
+
+	sf::Vector2f GetThumbStickLeft();
+	sf::Vector2f GetThumbStickRight();
 private:
 	std::map<int, sf::Keyboard::Key> m_Actions;
+
+	XINPUT_STATE m_CurrentState; // controller state
 };
 

@@ -3,23 +3,29 @@
 #include "ResourceManager.h"
 #include "InputManager.h"
 
+
 Game::Game()
 {
-	m_pWindow = new sf::RenderWindow({ 800, 600 }, "Game");
-	m_Rect.setSize({ 100.0f, 100.0f });
-	m_Rect.setPosition({ 100.0f, 100.0f });
-	m_Rect.setTexture(ResourceManager::GetInstance()->RequestTexture("Ghost"));
+	m_pWindow = new sf::RenderWindow({ 800, 600 }, "Game");	
 
 	InputManager::GetInstance()->AddAction(InputKeys::Up, sf::Keyboard::Key::Up);
 	InputManager::GetInstance()->AddAction(InputKeys::Down, sf::Keyboard::Key::Down);
 	InputManager::GetInstance()->AddAction(InputKeys::Left, sf::Keyboard::Key::Left);
 	InputManager::GetInstance()->AddAction(InputKeys::Right, sf::Keyboard::Key::Right);
+
+	m_pPlayer = new Player();
+
+	m_View.setSize({ 800.0f, 600.0f });
+	m_View.zoom(1.0f);
 }
 
 
 Game::~Game()
 {
 	delete m_pWindow;
+	m_pWindow = nullptr;
+	delete m_pPlayer;
+	m_pPlayer = nullptr;
 	ResourceManager::GetInstance()->CleanUp();
 }
 
@@ -63,41 +69,22 @@ bool Game::ProcessEvents()
 
 void Game::Update(float deltaTime)
 {
-	auto input = InputManager::GetInstance();
-	auto pos = m_Rect.getPosition();
+	// InputManager::GetInstance()->Update(); // use it if you implement controller input 
+	
+	m_View.setCenter(m_pPlayer->GetPosition());
+	m_pPlayer->Update(deltaTime);
 
-	sf::Vector2<float> velocity;
-	float speed = 200.0f;
-
-	if (input->IsActionTriggered(InputKeys::Up))
-	{
-		velocity.y = -speed;
-	}
-	if (input->IsActionTriggered(InputKeys::Down))
-	{
-		velocity.y = speed;
-	}
-	if (input->IsActionTriggered(InputKeys::Left))
-	{
-		velocity.x = -speed;
-	}
-	if (input->IsActionTriggered(InputKeys::Right))
-	{
-		velocity.x = speed;
-	}
-
-	pos += velocity * deltaTime;
-
-	m_Rect.setPosition(pos);
+	// InputManager::GetInstance()->IsButtonPressed(XINPUT_GAMEPAD_X); // check controller button
 }
 
 void Game::Draw()
 {
 	m_pWindow->clear();
+	m_pWindow->setView(m_View);
+	// m_pWindow->setView(m_pWindow->getDefaultView()); // reset camera view
 
 	// draw stuff
-	m_pWindow->draw(m_Rect);
-
+	m_pPlayer->Draw(m_pWindow);
 
 	m_pWindow->display();
 }
