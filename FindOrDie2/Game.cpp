@@ -1,18 +1,20 @@
 #include "stdafx.h"
 #include "Game.h"
-
+#include "ResourceManager.h"
 
 Game::Game()
 {
 	m_pWindow = new sf::RenderWindow({ 800, 600 }, "Game");
 	m_Rect.setSize({ 100.0f, 100.0f });
 	m_Rect.setPosition({ 100.0f, 100.0f });
+	m_Rect.setTexture(ResourceManager::GetInstance()->RequestTexture("Ghost"));
 }
 
 
 Game::~Game()
 {
 	delete m_pWindow;
+	ResourceManager::GetInstance()->CleanUp();
 }
 
 void Game::Run()
