@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
 #include "ResourceManager.h"
+#include "InputManager.h"
 
 Game::Game()
 {
@@ -8,6 +9,11 @@ Game::Game()
 	m_Rect.setSize({ 100.0f, 100.0f });
 	m_Rect.setPosition({ 100.0f, 100.0f });
 	m_Rect.setTexture(ResourceManager::GetInstance()->RequestTexture("Ghost"));
+
+	InputManager::GetInstance()->AddAction(InputKeys::Up, sf::Keyboard::Key::Up);
+	InputManager::GetInstance()->AddAction(InputKeys::Down, sf::Keyboard::Key::Down);
+	InputManager::GetInstance()->AddAction(InputKeys::Left, sf::Keyboard::Key::Left);
+	InputManager::GetInstance()->AddAction(InputKeys::Right, sf::Keyboard::Key::Right);
 }
 
 
@@ -57,6 +63,32 @@ bool Game::ProcessEvents()
 
 void Game::Update(float deltaTime)
 {
+	auto input = InputManager::GetInstance();
+	auto pos = m_Rect.getPosition();
+
+	sf::Vector2<float> velocity;
+	float speed = 200.0f;
+
+	if (input->IsActionTriggered(InputKeys::Up))
+	{
+		velocity.y = -speed;
+	}
+	if (input->IsActionTriggered(InputKeys::Down))
+	{
+		velocity.y = speed;
+	}
+	if (input->IsActionTriggered(InputKeys::Left))
+	{
+		velocity.x = -speed;
+	}
+	if (input->IsActionTriggered(InputKeys::Right))
+	{
+		velocity.x = speed;
+	}
+
+	pos += velocity * deltaTime;
+
+	m_Rect.setPosition(pos);
 }
 
 void Game::Draw()
