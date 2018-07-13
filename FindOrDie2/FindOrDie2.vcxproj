@@ -154,6 +154,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="InputManager.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="ResourceManager.h" />
     <ClInclude Include="stdafx.h" />
@@ -164,6 +165,7 @@
     <ClCompile Include="FindOrDie2.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="InputManager.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="ResourceManager.cpp" />
     <ClCompile Include="stdafx.cpp">

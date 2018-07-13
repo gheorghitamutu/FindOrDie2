@@ -4,7 +4,8 @@
 
 Player::Player()
 {
-	m_Body.setSize({ 100.0f, 100.0f });
+	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
+	m_Body.setScale({ 2.4f, 2.4f });
 	m_Body.setPosition({ 0.0f, 0.0f });
 
 	auto textureRequired = ResourceManager::GetInstance()->RequestTexture("Player_Man");
@@ -55,6 +56,23 @@ void Player::Update(float elapsedSec)
 		m_Direction.y *= 2;
 	}
 
+	if (input->IsActionTriggered(InputKeys::Right) && input->IsActionTriggered(InputKeys::Left))
+	{
+		m_Direction.x = 0;
+		m_Direction.y = 0;
+	}
+
+	if (input->IsActionTriggered(InputKeys::Up) && input->IsActionTriggered(InputKeys::Down))
+	{
+		m_Direction.x = 0;
+		m_Direction.y = 0;
+	}
+
+	if (input->IsActionTriggered(InputKeys::C))
+	{
+		m_IsFocused = !m_IsFocused;
+	}
+
 	SetAnimationFrame();
 
 	// auto thumbstickState = InputManager::GetInstance()->GetThumbStickLeft;  // controller
@@ -76,6 +94,11 @@ void Player::Draw(sf::RenderWindow* pWindow)
 sf::Vector2f Player::GetPosition() const
 {
 	return m_Body.getPosition();
+}
+
+bool Player::IsFocused()
+{
+	return m_IsFocused;
 }
 
 void Player::SetAnimationFrame()

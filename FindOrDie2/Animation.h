@@ -6,7 +6,7 @@ class Animation
 public:
 	Animation() = default;
 	Animation(int x, int y, int width, int height, sf::Texture *texture);
-	void ApplyToSprite(sf::RectangleShape* body);
+	void ApplyToSprite(sf::Sprite* body);
 	void Update(float deltaTime);
 	~Animation();
 private:

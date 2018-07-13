@@ -4,12 +4,15 @@
 #include<Windows.h>
 #include<Xinput.h>
 
+#include<string>
+
 enum InputKeys
 {
 	Up,
 	Down,
 	Left,
-	Right
+	Right,
+	C		// (un)focus camera on player
 };
 
 class InputManager

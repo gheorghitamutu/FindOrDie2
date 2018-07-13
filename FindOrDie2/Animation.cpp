@@ -11,9 +11,9 @@ Animation::Animation(int x, int y, int width, int height, sf::Texture *texture)
 	}
 }
 
-void Animation::ApplyToSprite(sf::RectangleShape* body)
+void Animation::ApplyToSprite(sf::Sprite* body)
 {
-	body->setTexture(m_pTexture);
+	body->setTexture(*m_pTexture);
 	body->setTextureRect(m_Frames[m_FrameIndex]);
 }
 

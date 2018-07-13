@@ -9,6 +9,10 @@ public:
 	~Game();
 	void Run();
 
+public:
+	static const unsigned int windowHeight = 800;
+	static const unsigned int windowWidth = 600;
+
 private:
 	bool ProcessEvents();
 	void Update(float deltaTime);
@@ -19,6 +23,9 @@ private:
 
 	Player* m_pPlayer = nullptr;
 
-	sf::View m_View;
+	sf::View *m_pDefaultView = nullptr;
+	sf::View *m_pCurrentView = nullptr;
+
+	std::string m_WindowTitle = "Game";
 };
 
