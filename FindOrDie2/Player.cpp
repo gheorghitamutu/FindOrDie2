@@ -106,7 +106,17 @@ void Player::Update(float elapsedSec)
 
 void Player::Draw(sf::RenderWindow* pWindow)
 {
-	pWindow->draw(m_Body);
+	auto viewCenter = m_pView->getCenter();
+	auto viewSize = m_pView->getSize();
+
+	sf::FloatRect rectBounds;
+	rectBounds.left = viewCenter.x - viewSize.x / 2.f;
+	rectBounds.top = viewCenter.y - viewSize.y / 2.f;
+	rectBounds.width = viewSize.x;
+	rectBounds.height = viewSize.y;
+
+	if(m_Body.getGlobalBounds().intersects(rectBounds))
+		pWindow->draw(m_Body);
 }
 
 sf::Vector2f Player::GetPosition() const

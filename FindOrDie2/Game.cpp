@@ -28,6 +28,7 @@ Game::Game()
 
 	m_pPlayer = new Player();
 	m_pCurrentView = m_pPlayer->GetView();
+	m_pMap->SetView(m_pCurrentView);
 }
 
 
