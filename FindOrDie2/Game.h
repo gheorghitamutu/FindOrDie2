@@ -4,6 +4,15 @@
 #include "Map.h"
 #include <iostream>
 
+enum GameState
+{
+	MainMenu,
+	CharacterSelection,
+	Running,
+	Pause,
+	Exit
+};
+
 class Game
 {
 public:
@@ -31,5 +40,7 @@ private:
 	std::string m_WindowTitle = "Game";
 
 	Map* m_pMap = nullptr;
+
+	GameState m_CurrentGameState = GameState::Running;
 };
 

@@ -82,7 +82,14 @@ bool Game::ProcessEvents()
 			return false;
 		}
 
-		m_pPlayer->ProcessEvents(&event);
+		switch (m_CurrentGameState)
+		{
+		case GameState::Running:
+			m_pPlayer->ProcessEvents(&event);
+			break;
+		default:
+			break;
+		}
 	}
 
 	return true;
@@ -91,8 +98,20 @@ bool Game::ProcessEvents()
 void Game::Update(float deltaTime)
 {
 	// InputManager::GetInstance()->Update(); // use it if you implement controller input 
-	
-	m_pPlayer->Update(deltaTime);
+
+	switch (m_CurrentGameState)
+	{
+	case GameState::MainMenu:
+		// Menu State
+		// ...
+		break;
+	case GameState::Running:
+		// Running State
+		m_pPlayer->Update(deltaTime);
+		break;
+	default:
+		break;
+	}
 
 	// InputManager::GetInstance()->IsButtonPressed(XINPUT_GAMEPAD_X); // check controller button
 }
@@ -101,11 +120,22 @@ void Game::Draw()
 {
 	m_pWindow->clear();
 	m_pWindow->setView(*m_pCurrentView);
-	// m_pWindow->setView(m_pWindow->getDefaultView()); // reset camera view
 
 	// draw stuff
-	m_pMap->Draw(m_pWindow);
-	m_pPlayer->Draw(m_pWindow);
+	switch (m_CurrentGameState)
+	{
+	case GameState::MainMenu:
+		// Menu State
+		// ...
+		break;
+	case GameState::Running:
+		// Running State
+		m_pMap->Draw(m_pWindow);
+		m_pPlayer->Draw(m_pWindow);
+		break;
+	default:
+		break;
+	}
 
 	m_pWindow->display();
 }
