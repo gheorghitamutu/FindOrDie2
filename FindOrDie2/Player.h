@@ -12,7 +12,9 @@ public:
 	void Update(float elapsedSec);
 	void Draw(sf::RenderWindow* pWindow);
 	sf::Vector2f GetPosition() const;
-	bool IsFocused();
+	void ChangeFocus();
+	sf::View* GetView();
+	void ProcessEvents(sf::Event* event);
 
 private:
 	sf::Sprite m_Body;
@@ -21,6 +23,7 @@ private:
 	static constexpr float m_DefaultSpeed = 80.0f;
 	static constexpr float m_WalkingSpeed = 1.1f;
 	bool m_IsFocused = false;
+	sf::View* m_pView = nullptr;
 
 public:
 	enum class AnimationIndex

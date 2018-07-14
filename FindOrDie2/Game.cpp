@@ -17,14 +17,15 @@ Game::Game()
 	m_pMap = Map::GetInstance();
 	m_pMap->GenerateMap();
 
-	m_pPlayer = new Player();
-
 	m_pDefaultView = new sf::View();
 	m_pDefaultView->setSize({ (float)windowHeight, (float)windowWidth });
 	m_pDefaultView->zoom(1.0f);
 	m_pDefaultView->setCenter({ 0,0 });
 
 	m_pCurrentView = m_pDefaultView;
+
+	m_pPlayer = new Player();
+	m_pCurrentView = m_pPlayer->GetView();
 }
 
 
@@ -80,6 +81,8 @@ bool Game::ProcessEvents()
 			m_pWindow->close();
 			return false;
 		}
+
+		m_pPlayer->ProcessEvents(&event);
 	}
 
 	return true;
@@ -89,8 +92,6 @@ void Game::Update(float deltaTime)
 {
 	// InputManager::GetInstance()->Update(); // use it if you implement controller input 
 	
-	if(m_pPlayer->IsFocused())
-		m_pCurrentView->setCenter(m_pPlayer->GetPosition());
 	m_pPlayer->Update(deltaTime);
 
 	// InputManager::GetInstance()->IsButtonPressed(XINPUT_GAMEPAD_X); // check controller button

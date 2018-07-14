@@ -31,7 +31,8 @@ public:
 	void Update();
 
 	void AddAction(int id, sf::Keyboard::Key key);
-	bool IsActionTriggered(int id);
+	bool IsKeyPressed(int id);
+	bool IsKeyReleased(int id, sf::Event* event);
 
 	bool IsButtonPressed(WORD button); // controller button
 

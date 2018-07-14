@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Player.h"
+#include "Game.h"
 
 
 Player::Player()
@@ -7,6 +8,11 @@ Player::Player()
 	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
 	m_Body.setScale({ 1.0f, 1.0f });
 	m_Body.setPosition({ 0.0f, 0.0f });
+
+	m_pView = new sf::View();
+	m_pView->setSize({ (float)Game::windowHeight, (float)Game::windowWidth });
+	m_pView->zoom(1.0f);
+	m_pView->setCenter({ 0,0 });
 
 	auto textureRequired = ResourceManager::GetInstance()->RequestTexture("Player_Man");
 	
@@ -25,53 +31,13 @@ Player::Player()
 
 Player::~Player()
 {
+	delete m_pView;
+	m_pView = nullptr;
 }
 
 void Player::Update(float elapsedSec)
 {
-	auto input = InputManager::GetInstance();
 	auto pos = m_Body.getPosition();
-	m_Direction = { 0, 0 };
-
-	if (input->IsActionTriggered(InputKeys::Up))
-	{
-		m_Direction.y = -1;
-	}
-	if (input->IsActionTriggered(InputKeys::Down))
-	{
-		m_Direction.y = 1;
-	}
-	if (input->IsActionTriggered(InputKeys::Left))
-	{
-		m_Direction.x = -1;
-	}
-	if (input->IsActionTriggered(InputKeys::Right))
-	{
-		m_Direction.x = 1;
-	}
-
-	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
-	{
-		m_Direction.x *= 2;
-		m_Direction.y *= 2;
-	}
-
-	if (input->IsActionTriggered(InputKeys::Right) && input->IsActionTriggered(InputKeys::Left))
-	{
-		m_Direction.x = 0;
-		m_Direction.y = 0;
-	}
-
-	if (input->IsActionTriggered(InputKeys::Up) && input->IsActionTriggered(InputKeys::Down))
-	{
-		m_Direction.x = 0;
-		m_Direction.y = 0;
-	}
-
-	if (input->IsActionTriggered(InputKeys::C))
-	{
-		m_IsFocused = !m_IsFocused;
-	}
 
 	SetAnimationFrame();
 
@@ -84,6 +50,9 @@ void Player::Update(float elapsedSec)
 	m_Animations[int(m_CurrentAnimation)].ApplyToSprite(&m_Body);
 
 	m_Body.setPosition(pos);
+
+	if (m_IsFocused)
+		m_pView->setCenter(m_Body.getPosition());
 }
 
 void Player::Draw(sf::RenderWindow* pWindow)
@@ -96,9 +65,61 @@ sf::Vector2f Player::GetPosition() const
 	return m_Body.getPosition();
 }
 
-bool Player::IsFocused()
+void Player::ChangeFocus()
 {
-	return m_IsFocused;
+	m_IsFocused = !m_IsFocused;
+}
+
+sf::View * Player::GetView()
+{
+	return m_pView;
+}
+
+void Player::ProcessEvents(sf::Event * event)
+{
+	m_Direction = { 0, 0 };
+
+	auto input = InputManager::GetInstance();
+
+	if (input->IsKeyPressed(InputKeys::Up))
+	{
+		m_Direction.y = -1;
+	}
+	if (input->IsKeyPressed(InputKeys::Down))
+	{
+		m_Direction.y = 1;
+	}
+	if (input->IsKeyPressed(InputKeys::Left))
+	{
+		m_Direction.x = -1;
+	}
+	if (input->IsKeyPressed(InputKeys::Right))
+	{
+		m_Direction.x = 1;
+	}
+
+	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
+	{
+		m_Direction.x *= 2;
+		m_Direction.y *= 2;
+	}
+
+	if (input->IsKeyPressed(InputKeys::Right) && input->IsKeyPressed(InputKeys::Left))
+	{
+		m_Direction.x = 0;
+		m_Direction.y = 0;
+	}
+
+	if (input->IsKeyPressed(InputKeys::Up) && input->IsKeyPressed(InputKeys::Down))
+	{
+		m_Direction.x = 0;
+		m_Direction.y = 0;
+	}
+
+	if (input->IsKeyReleased(InputKeys::C, event))
+	{
+		m_IsFocused = !m_IsFocused;
+	}
 }
 
 void Player::SetAnimationFrame()
