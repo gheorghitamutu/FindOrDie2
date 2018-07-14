@@ -42,5 +42,6 @@ private:
 	Map* m_pMap = nullptr;
 
 	GameState m_CurrentGameState = GameState::Running;
+	unsigned int m_MaxFPS = 60;
 };
 

@@ -7,12 +7,14 @@
 Game::Game()
 {
 	m_pWindow = new sf::RenderWindow({ windowHeight, windowWidth }, m_WindowTitle);
+	m_pWindow->setFramerateLimit(m_MaxFPS);
 
 	InputManager::GetInstance()->AddAction(InputKeys::Up, sf::Keyboard::Key::Up);
 	InputManager::GetInstance()->AddAction(InputKeys::Down, sf::Keyboard::Key::Down);
 	InputManager::GetInstance()->AddAction(InputKeys::Left, sf::Keyboard::Key::Left);
 	InputManager::GetInstance()->AddAction(InputKeys::Right, sf::Keyboard::Key::Right);
 	InputManager::GetInstance()->AddAction(InputKeys::C, sf::Keyboard::Key::C);
+	InputManager::GetInstance()->AddAction(InputKeys::Esc, sf::Keyboard::Key::Escape);
 
 	m_pMap = Map::GetInstance();
 	m_pMap->GenerateMap();
@@ -58,7 +60,7 @@ void Game::Run()
 		// check fps
 		float fps = 1.0f / deltaTime;
 		std::cout << "\r" << fps ;
-		
+
 		// check events
 		isRunning = ProcessEvents();
 		if (!isRunning) return;
@@ -86,6 +88,13 @@ bool Game::ProcessEvents()
 		{
 		case GameState::Running:
 			m_pPlayer->ProcessEvents(&event);
+
+			if (InputManager::GetInstance()->IsKeyReleased(InputKeys::Esc, &event))
+				m_CurrentGameState = GameState::Pause;
+			break;
+		case GameState::Pause:
+			if (InputManager::GetInstance()->IsKeyReleased(InputKeys::Esc, &event))
+				m_CurrentGameState = GameState::Running;
 			break;
 		default:
 			break;

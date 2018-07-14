@@ -23,7 +23,10 @@ private:
 	static constexpr float m_DefaultSpeed = 80.0f;
 	static constexpr float m_WalkingSpeed = 1.1f;
 	bool m_IsFocused = false;
+	sf::Vector2<bool> m_ViewCentered = { false, false };
 	sf::View* m_pView = nullptr;
+	float m_AmountToMoveView = 3.f;
+	int m_ErrorRatePosition = 2;
 
 public:
 	enum class AnimationIndex

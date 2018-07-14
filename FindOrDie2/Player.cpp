@@ -55,25 +55,50 @@ void Player::Update(float elapsedSec)
 	{
 		auto playerPosition = m_Body.getPosition();
 		auto viewPosition = m_pView->getCenter();
-		if (playerPosition != viewPosition)
+
+		// you try guessing that the new view position will be the player's one
+		sf::Vector2f viewNewPosition = playerPosition;
+
+		// the player has the view already centered on him
+		if (m_ViewCentered.x == true && m_ViewCentered.y == true)
 		{
-			sf::Vector2f viewNewPosition = { 0, 0 };
-			float amountToMove = 1.f;
+			m_pView->setCenter(playerPosition);
+		}
+		else // the view is not centered on the player
+		{
+			auto deltaDistance = playerPosition - viewPosition;
+			deltaDistance.x = abs(deltaDistance.x);
+			deltaDistance.y = abs(deltaDistance.y);
 
-			if ((int)viewPosition.x > (int)playerPosition.x)
-				viewNewPosition.x = viewPosition.x - amountToMove;
-			else if ((int)viewPosition.x < (int)playerPosition.x)
-				viewNewPosition.x = viewPosition.x + amountToMove;
-			else
-				viewNewPosition.x = viewPosition.x;
-		
-			if ((int)viewPosition.y > (int)playerPosition.y)
-				viewNewPosition.y = viewPosition.y - amountToMove;
-			else if ((int)viewPosition.y < (int)playerPosition.y)
-				viewNewPosition.y = viewPosition.y + amountToMove;
-			else
-				viewNewPosition.y = viewPosition.y;
+			// the distance from the view center to the player can be neglected
+			if (deltaDistance.x < m_ErrorRatePosition && deltaDistance.y < m_ErrorRatePosition)
+			{
+				m_ViewCentered = { true, true };
+				viewNewPosition = { playerPosition.x, playerPosition.y };
+			}
+			else // the distance from the view center to the player is noticeable
+			{
+				if (deltaDistance.x > m_ErrorRatePosition) // x axis is too big
+				{
+					if ((int)viewPosition.x > (int)playerPosition.x)
+						viewNewPosition.x = viewPosition.x - m_AmountToMoveView;
+					else if ((int)viewPosition.x < (int)playerPosition.x)
+						viewNewPosition.x = viewPosition.x + m_AmountToMoveView;
+				}
 
+				if (deltaDistance.y > m_ErrorRatePosition) // y axis is too big
+				{
+					if ((int)viewPosition.y > (int)playerPosition.y)
+						viewNewPosition.y = viewPosition.y - m_AmountToMoveView;
+					else if ((int)viewPosition.y < (int)playerPosition.y)
+						viewNewPosition.y = viewPosition.y + m_AmountToMoveView;
+				}
+
+				// so the view is not yet centered on the player
+				m_ViewCentered = { false, false };
+			}
+
+			// correct the view center bringing it close to the player
 			m_pView->setCenter(viewNewPosition);
 		}
 	}

@@ -12,7 +12,8 @@ enum InputKeys
 	Down,
 	Left,
 	Right,
-	C		// (un)focus camera on player
+	C,		// (un)focus camera on player
+	Esc		// switch states 
 };
 
 class InputManager
