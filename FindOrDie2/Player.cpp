@@ -52,7 +52,31 @@ void Player::Update(float elapsedSec)
 	m_Body.setPosition(pos);
 
 	if (m_IsFocused)
-		m_pView->setCenter(m_Body.getPosition());
+	{
+		auto playerPosition = m_Body.getPosition();
+		auto viewPosition = m_pView->getCenter();
+		if (playerPosition != viewPosition)
+		{
+			sf::Vector2f viewNewPosition = { 0, 0 };
+			float amountToMove = 1.f;
+
+			if ((int)viewPosition.x > (int)playerPosition.x)
+				viewNewPosition.x = viewPosition.x - amountToMove;
+			else if ((int)viewPosition.x < (int)playerPosition.x)
+				viewNewPosition.x = viewPosition.x + amountToMove;
+			else
+				viewNewPosition.x = viewPosition.x;
+		
+			if ((int)viewPosition.y > (int)playerPosition.y)
+				viewNewPosition.y = viewPosition.y - amountToMove;
+			else if ((int)viewPosition.y < (int)playerPosition.y)
+				viewNewPosition.y = viewPosition.y + amountToMove;
+			else
+				viewNewPosition.y = viewPosition.y;
+
+			m_pView->setCenter(viewNewPosition);
+		}
+	}
 }
 
 void Player::Draw(sf::RenderWindow* pWindow)
