@@ -17,7 +17,6 @@ Game::Game()
 	InputManager::GetInstance()->AddAction(InputKeys::Esc, sf::Keyboard::Key::Escape);
 
 	m_pMap = Map::GetInstance();
-	m_pMap->GenerateMap();
 
 	m_pDefaultView = new sf::View();
 	m_pDefaultView->setSize({ (float)windowHeight, (float)windowWidth });
@@ -28,7 +27,11 @@ Game::Game()
 
 	m_pPlayer = new Player();
 	m_pCurrentView = m_pPlayer->GetView();
+
 	m_pMap->SetView(m_pCurrentView);
+	
+	std::thread generateMapThread(&Map::GenerateMap, m_pMap);
+	generateMapThread.detach();
 }
 
 

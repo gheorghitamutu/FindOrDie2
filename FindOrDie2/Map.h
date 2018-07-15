@@ -2,11 +2,49 @@
 #include "SFML/Graphics.hpp"
 #include <vector>
 #include "ResourceManager.h"
+#include <unordered_map>
+#include "TileBlock.h"
+#include <utility>
+#include <mutex>
+
+struct Key
+{
+	int x;
+	int y;
+
+	bool operator==(const Key &other) const
+	{
+		return (x == other.x && y == other.y);
+	}
+};
+
+namespace std {
+
+  template <>
+  struct hash<Key>
+  {
+    std::size_t operator()(const Key& k) const
+    {
+      using std::size_t;
+      using std::hash;
+
+      // Compute individual hash values for first,
+      // second and third and combine them using XOR
+      // and bit shifting:
+
+      return ((hash<int>()(k.x)
+               ^ (hash<int>()(k.y) << 1)) >> 1);
+    }
+  };
+
+}
 
 class Map
 {
 private:
 	Map();
+	Key GetKey(sf::Vector2f coords);
+	std::vector<Key> GetNeighbors(Key key, unsigned int levels);
 
 public:
 	static Map* GetInstance()
@@ -25,8 +63,14 @@ public:
 	static const unsigned int tileSize = 64;
 
 private:
-	std::vector<sf::Sprite*> m_Tiles;
 	sf::View* m_pCurrentView = nullptr; // no view created here, do not free it
-	unsigned long long m_MatrixTileSize = 2000;
+	unsigned long long m_MatrixTileSize = 10000;
+	sf::FloatRect m_ViewRectBounds;
+	sf::Vector2f m_ViewSize = { 0.f, 0.f };
+	std::unordered_map < Key, TileBlock* > m_TileBlocks;
+	sf::Vector2<int> m_BlockMaxTiles = { 0,0 };
+	sf::Vector2<int> m_BlockSize = { 0,0 };
+
+	std::mutex m_mtx;
 };
 

@@ -3,6 +3,7 @@
 #include "Player.h"
 #include "Map.h"
 #include <iostream>
+#include <thread>
 
 enum GameState
 {
@@ -21,8 +22,8 @@ public:
 	void Run();
 
 public:
-	static const unsigned int windowHeight = 800;
-	static const unsigned int windowWidth = 600;
+	static const unsigned int windowHeight = 1920;
+	static const unsigned int windowWidth = 1080;
 
 private:
 	bool ProcessEvents();
