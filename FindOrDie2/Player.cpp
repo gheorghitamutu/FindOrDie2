@@ -3,7 +3,7 @@
 #include "Game.h"
 
 
-Player::Player()
+Player::Player() noexcept
 {
 	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
 	m_Body.setScale({ 1.0f, 1.0f });
@@ -18,13 +18,15 @@ Player::Player()
 	
 	for (int i = 0; i < int(AnimationIndex::Count); i++)
 	{
-		m_Animations[i] = 
+		m_Animations.emplace_back(
 			Animation(
 				(int)m_TextureSize, 
 				(int)(i*m_TextureSize), 
 				(int)m_TextureSize, 
 				(int)m_TextureSize, 
-				textureRequired);
+				textureRequired,
+				m_NumberOfFrames,
+				m_HoldTime));
 	}
 }
 

@@ -3,8 +3,9 @@
 #include <minwinbase.h>
 
 
-InputManager::InputManager()
+InputManager::InputManager() noexcept
 {
+	ZeroMemory(&m_CurrentState, sizeof(XINPUT_STATE));
 }
 
 

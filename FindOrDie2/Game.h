@@ -17,7 +17,7 @@ enum GameState
 class Game
 {
 public:
-	Game();
+	Game() noexcept;
 	~Game();
 	void Run();
 

@@ -4,7 +4,7 @@
 class Menu
 {
 private:
-	Menu();
+	Menu() noexcept;
 
 public:
 	static Menu* GetInstance()

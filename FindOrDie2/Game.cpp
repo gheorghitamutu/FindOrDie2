@@ -4,7 +4,7 @@
 #include "InputManager.h"
 
 
-Game::Game()
+Game::Game() noexcept
 {
 	m_pWindow = new sf::RenderWindow({ windowHeight, windowWidth }, m_WindowTitle);
 	m_pWindow->setFramerateLimit(m_MaxFPS);
@@ -63,7 +63,7 @@ void Game::Run()
 
 		// check fps
 		float fps = 1.0f / deltaTime;
-		std::cout << "\r" << fps ;
+		//std::cout << "\r" << fps ;
 
 		// check events
 		isRunning = ProcessEvents();

@@ -19,7 +19,7 @@ enum InputKeys
 class InputManager
 {
 private:
-	InputManager();
+	InputManager() noexcept;
 
 public:
 	static InputManager* GetInstance()

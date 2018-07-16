@@ -42,7 +42,7 @@ namespace std {
 class Map
 {
 private:
-	Map();
+	Map() noexcept;
 	Key GetKey(sf::Vector2f coords);
 	std::vector<Key> GetNeighbors(Key key, unsigned int levels);
 
@@ -64,7 +64,7 @@ public:
 
 private:
 	sf::View* m_pCurrentView = nullptr; // no view created here, do not free it
-	unsigned long long m_MatrixTileSize = 10000;
+	unsigned long long m_MatrixTileSize = 100;
 	sf::FloatRect m_ViewRectBounds;
 	sf::Vector2f m_ViewSize = { 0.f, 0.f };
 	std::unordered_map < Key, TileBlock* > m_TileBlocks;

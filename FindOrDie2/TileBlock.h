@@ -5,7 +5,7 @@
 class TileBlock
 {
 public:
-	TileBlock();
+	TileBlock() noexcept;
 	~TileBlock();
 	std::vector<Tile*>* GetTiles();
 

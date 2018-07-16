@@ -4,10 +4,11 @@
 #include "ResourceManager.h"
 #include "Animation.h"
 
+
 class Player
 {
 public:
-	Player();
+	Player() noexcept;
 	~Player();
 	void Update(float elapsedSec);
 	void Draw(sf::RenderWindow* pWindow);
@@ -59,8 +60,10 @@ public:
 	};
 
 private:
-	Animation m_Animations[(int)AnimationIndex::Count];
+	std::vector<Animation> m_Animations;
 	AnimationIndex m_CurrentAnimation = AnimationIndex::IdleSouth;
+	int m_NumberOfFrames = 7;
+	float m_HoldTime = 0.1f;
 
 private:
 	void SetAnimationFrame();

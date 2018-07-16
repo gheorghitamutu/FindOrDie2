@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-Map::Map()
+Map::Map() noexcept
 {
 }
 
@@ -111,7 +111,7 @@ void Map::GenerateMap()
 		for (int j = 0; j < m_MatrixTileSize; j++)
 		{
 			tile = new Tile(
-				"Surface_Left", 
+				"Full_Block", 
 				TileType::RockSolid, 
 				TileAppearance::Visible, 
 				TileUsage::Floor, 
@@ -150,27 +150,41 @@ void Map::Draw(sf::RenderWindow * pWindow)
 
 	Key chunkPosition = GetKey(viewCenter);
 
-	std::vector<Key> chunkIndentifiers = GetNeighbors(chunkPosition, 2);
+	std::vector<Key> chunkIndentifiers = GetNeighbors(chunkPosition, 1);
 
 	m_mtx.lock();
 
 	// you lock the query operation in order to draw on the screen only what's already
 	// generated and required for the current view
+
+	// you get all tiles from all blocks in the view center into one vector of tiles
+	std::vector<Tile*> tiles;
 	{
 		for (auto &chunkId : chunkIndentifiers)
 		{
 			auto tileBlock = m_TileBlocks.find(chunkId);
 			if (tileBlock != m_TileBlocks.end())
 			{
-				auto tiles = tileBlock->second->GetTiles();
-				for (auto tile : *tiles)
-				{
-					if (tile->IsVisible())
-					{
-						pWindow->draw(*tile->GetBody());
-					}
-				}
+				auto blockTiles = tileBlock->second->GetTiles();
+				tiles.insert(tiles.end(), blockTiles->begin(), blockTiles->end());
 			}
+		}
+
+		// then you sort the tiles in order to draw them isometric and not overlap them
+		std::sort(tiles.begin(), tiles.end(), [](Tile* a, Tile* b)
+		{	
+			auto aBody = a->GetBody();
+			auto bBody = b->GetBody();
+			auto aPos = aBody->getPosition();
+			auto bPos = bBody->getPosition();
+
+			return aPos.y == bPos.y ? aPos.x > bPos.x : aPos.y < bPos.y;
+		});
+
+		// draw the sorted tiles
+		for (auto tile : tiles)
+		{
+			pWindow->draw(*tile->GetBody());
 		}
 	}
 	// you unlock it

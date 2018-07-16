@@ -2,11 +2,11 @@
 #include "ResourceManager.h"
 
 
-ResourceManager::ResourceManager()
+ResourceManager::ResourceManager() noexcept
 {
 	LoadTexture("Resources/Sprites/ghost.png", "Ghost");
 	LoadTexture("Resources/Sprites/Player_Man/man.png", "Player_Man");
-	LoadTexture("Resources/Sprites/Terrain/Tiles/surface_left.png", "Surface_Left");
+	LoadTexture("Resources/Sprites/Terrain/Tiles/full_block.png", "Full_Block");
 }
 
 void ResourceManager::LoadTexture(std::string path, std::string name)

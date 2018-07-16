@@ -5,7 +5,7 @@
 class ResourceManager
 {
 private:
-	ResourceManager();
+	ResourceManager() noexcept;
 	void LoadTexture(std::string path, std::string name);
 
 public:

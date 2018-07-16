@@ -2,12 +2,14 @@
 #include "Animation.h"
 
 
-Animation::Animation(int x, int y, int width, int height, sf::Texture *texture)
+Animation::Animation(int x, int y, int width, int height, sf::Texture *texture, int numberOfFrames, float holdTime) :
+	m_NumberOfFrames(numberOfFrames),
+	m_HoldTime(holdTime)
 {
 	m_pTexture = texture;
 	for (int i = 0; i < m_NumberOfFrames; i++)
 	{
-		m_Frames[i] = { x + i * width, y, width, height };
+		m_Frames.emplace_back(sf::IntRect { x + i * width, y, width, height });
 	}
 }
 
