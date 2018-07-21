@@ -1,10 +1,9 @@
-#include "stdafx.h"
 #include "StateMachine.hpp"
 
 
-namespace GameState
+namespace GameEngine
 {
-	void GameState::StateMachine::AddState(StateRef newState, bool isReplacing)
+	void GameEngine::StateMachine::AddState(StateRef newState, bool isReplacing)
 	{
 		m_IsAdding = true;
 		m_IsReplacing = isReplacing;
@@ -12,12 +11,12 @@ namespace GameState
 		m_NewState = std::move(newState);
 	}
 
-	void GameState::StateMachine::RemoveState()
+	void GameEngine::StateMachine::RemoveState()
 	{
 		m_IsRemoving = true;
 	}
 
-	void GameState::StateMachine::ProcessStateChanges()
+	void GameEngine::StateMachine::ProcessStateChanges()
 	{
 		if (m_IsRemoving && !m_States.empty())
 		{
@@ -51,7 +50,7 @@ namespace GameState
 		}
 	}
 
-	StateRef & GameState::StateMachine::GetActiveState()
+	StateRef & GameEngine::StateMachine::GetActiveState()
 	{
 		return m_States.top();
 	}

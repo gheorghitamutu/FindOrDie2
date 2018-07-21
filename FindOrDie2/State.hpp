@@ -1,7 +1,7 @@
 #pragma once
 
 
-namespace GameState
+namespace GameEngine
 {
 	class State
 	{

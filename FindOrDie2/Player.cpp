@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "Player.h"
 #include "Game.h"
 
@@ -14,7 +13,7 @@ Player::Player() noexcept
 	m_pView->zoom(1.0f);
 	m_pView->setCenter({ 0,0 });
 
-	auto textureRequired = ResourceManager::GetInstance()->RequestTexture("Player_Man");
+	auto textureRequired = GameEngine::AssetManager::GetInstance()->GetTexture("Player_Man");
 	
 	for (int i = 0; i < int(AnimationIndex::Count); i++)
 	{

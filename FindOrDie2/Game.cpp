@@ -1,6 +1,5 @@
-#include "stdafx.h"
 #include "Game.h"
-#include "ResourceManager.h"
+#include "AssetManager.h"
 #include "InputManager.h"
 
 
@@ -46,7 +45,7 @@ Game::~Game()
 	delete m_pDefaultView;
 	m_pDefaultView = nullptr;
 
-	ResourceManager::GetInstance()->CleanUp();
+	GameEngine::AssetManager::GetInstance()->CleanUp();
 	Map::GetInstance()->CleanUp();
 }
 
@@ -110,8 +109,6 @@ bool Game::ProcessEvents()
 
 void Game::Update(float deltaTime)
 {
-	// InputManager::GetInstance()->Update(); // use it if you implement controller input 
-
 	switch (m_CurrentGameState)
 	{
 	case GameState::MainMenu:
@@ -125,8 +122,6 @@ void Game::Update(float deltaTime)
 	default:
 		break;
 	}
-
-	// InputManager::GetInstance()->IsButtonPressed(XINPUT_GAMEPAD_X); // check controller button
 }
 
 void Game::Draw()

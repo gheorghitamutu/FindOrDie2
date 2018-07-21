@@ -35,13 +35,7 @@ public:
 	bool IsKeyPressed(int id);
 	bool IsKeyReleased(int id, sf::Event* event);
 
-	bool IsButtonPressed(WORD button); // controller button
-
-	sf::Vector2f GetThumbStickLeft(); // controller thumb
-	sf::Vector2f GetThumbStickRight(); // controller thumb
 private:
 	std::map<int, sf::Keyboard::Key> m_Actions;
-
-	XINPUT_STATE m_CurrentState; // controller state
 };
 

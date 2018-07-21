@@ -1,11 +1,18 @@
-#include "stdafx.h"
 #include "Tile.h"
 
 
 Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state)
 {
 	m_Body = new sf::Sprite();
-	m_Body->setTexture(*ResourceManager::GetInstance()->RequestTexture(name));
+	auto bodyTexture = GameEngine::AssetManager::GetInstance()->GetTexture(name);
+	if (bodyTexture != nullptr)
+	{
+		m_Body->setTexture(*bodyTexture);
+	}
+	else
+	{
+		m_Body->setColor(sf::Color::Magenta);
+	}
 
 	m_Type = type;
 	m_Appearance = appearance;
