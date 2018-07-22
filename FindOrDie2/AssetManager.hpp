@@ -4,7 +4,6 @@
 
 #include <SFML/Graphics.hpp>
 
-
 namespace GameEngine
 {
 	class AssetManager

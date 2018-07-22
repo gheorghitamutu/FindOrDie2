@@ -152,17 +152,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Animation.h" />
-    <ClInclude Include="AssetManager.h" />
-    <ClInclude Include="Game.h" />
-    <ClInclude Include="InputManager.h" />
-    <ClInclude Include="Map.h" />
-    <ClInclude Include="Menu.h" />
-    <ClInclude Include="Player.h" />
+    <ClInclude Include="Animation.hpp" />
+    <ClInclude Include="AssetManager.hpp" />
+    <ClInclude Include="Game.hpp" />
+    <ClInclude Include="InputManager.hpp" />
+    <ClInclude Include="Map.hpp" />
+    <ClInclude Include="Menu.hpp" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateMachine.hpp" />
-    <ClInclude Include="Tile.h" />
-    <ClInclude Include="TileBlock.h" />
+    <ClInclude Include="Tile.hpp" />
+    <ClInclude Include="TileBlock.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />

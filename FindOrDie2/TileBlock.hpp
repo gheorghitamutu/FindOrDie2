@@ -1,6 +1,5 @@
 #pragma once
-#include "Tile.h"
-
+#include "Tile.hpp"
 
 class TileBlock
 {

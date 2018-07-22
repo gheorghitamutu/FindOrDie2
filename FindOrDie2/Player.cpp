@@ -1,6 +1,5 @@
-#include "Player.h"
-#include "Game.h"
-
+#include "Player.hpp"
+#include "Game.hpp"
 
 Player::Player() noexcept
 {
@@ -28,7 +27,6 @@ Player::Player() noexcept
 				m_HoldTime));
 	}
 }
-
 
 Player::~Player()
 {

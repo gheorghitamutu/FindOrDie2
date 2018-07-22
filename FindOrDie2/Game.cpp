@@ -1,7 +1,6 @@
-#include "Game.h"
-#include "AssetManager.h"
-#include "InputManager.h"
-
+#include "Game.hpp"
+#include "AssetManager.hpp"
+#include "InputManager.hpp"
 
 Game::Game() noexcept
 {
@@ -32,7 +31,6 @@ Game::Game() noexcept
 	std::thread generateMapThread(&Map::GenerateMap, m_pMap);
 	generateMapThread.detach();
 }
-
 
 Game::~Game()
 {

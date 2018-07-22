@@ -1,7 +1,10 @@
 #pragma once
-#include "SFML/Graphics.hpp"
-#include "AssetManager.h"
+
 #include <vector>
+
+#include "SFML/Graphics.hpp"
+
+#include "AssetManager.hpp"
 
 enum TileType
 {

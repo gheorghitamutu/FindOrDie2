@@ -1,10 +1,9 @@
 #pragma once
+
+#include <string>
+#include <map>
+
 #include <SFML/Graphics.hpp>
-
-#include<Windows.h>
-#include<Xinput.h>
-
-#include<string>
 
 enum InputKeys
 {

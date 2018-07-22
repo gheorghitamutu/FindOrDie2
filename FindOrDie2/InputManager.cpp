@@ -1,10 +1,8 @@
-#include "InputManager.h"
-
+#include "InputManager.hpp"
 
 InputManager::InputManager() noexcept
 {
 }
-
 
 InputManager::~InputManager()
 {

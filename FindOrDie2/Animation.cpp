@@ -1,5 +1,4 @@
-#include "Animation.h"
-
+#include "Animation.hpp"
 
 Animation::Animation(int x, int y, int width, int height, sf::Texture *texture, int numberOfFrames, float holdTime) :
 	m_NumberOfFrames(numberOfFrames),

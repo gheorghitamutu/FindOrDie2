@@ -1,11 +1,14 @@
 #pragma once
-#include "SFML/Graphics.hpp"
+
 #include <vector>
-#include "AssetManager.h"
 #include <unordered_map>
-#include "TileBlock.h"
 #include <utility>
 #include <mutex>
+
+#include "SFML/Graphics.hpp"
+
+#include "AssetManager.hpp"
+#include "TileBlock.hpp"
 
 struct Key
 {

@@ -1,9 +1,12 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include "Player.h"
-#include "Map.h"
+
 #include <iostream>
 #include <thread>
+
+#include <SFML/Graphics.hpp>
+
+#include "Player.hpp"
+#include "Map.hpp"
 
 enum GameState
 {

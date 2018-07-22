@@ -1,9 +1,10 @@
 #pragma once
-#include <SFML/Graphics.hpp>
-#include "InputManager.h"
-#include "AssetManager.h"
-#include "Animation.h"
 
+#include <SFML/Graphics.hpp>
+
+#include "InputManager.hpp"
+#include "AssetManager.hpp"
+#include "Animation.hpp"
 
 class Player
 {

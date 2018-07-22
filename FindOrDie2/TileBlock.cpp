@@ -1,10 +1,8 @@
-#include "TileBlock.h"
-
+#include "TileBlock.hpp"
 
 TileBlock::TileBlock() noexcept
 {
 }
-
 
 TileBlock::~TileBlock()
 {

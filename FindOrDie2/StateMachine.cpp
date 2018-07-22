@@ -1,6 +1,5 @@
 #include "StateMachine.hpp"
 
-
 namespace GameEngine
 {
 	void GameEngine::StateMachine::AddState(StateRef newState, bool isReplacing)

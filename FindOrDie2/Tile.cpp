@@ -1,5 +1,4 @@
-#include "Tile.h"
-
+#include "Tile.hpp"
 
 Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state)
 {

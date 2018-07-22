@@ -1,10 +1,8 @@
-#include "Menu.h"
-
+#include "Menu.hpp"
 
 Menu::Menu() noexcept
 {
 }
-
 
 Menu::~Menu()
 {
