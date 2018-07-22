@@ -4,9 +4,9 @@ namespace GameEngine
 {
 	AssetManager::AssetManager()
 	{
-		LoadTexture("Resources/Sprites/ghost.png", "Ghost");
-		LoadTexture("Resources/Sprites/Player_Man/man.png", "Player_Man");
-		LoadTexture("Resources/Sprites/TerrainTiles/full_block.png", "Full_Block");
+		LoadTexture("Ghost",		"Resources/Sprites/ghost.png");
+		LoadTexture("Player_Man",	"Resources/Sprites/Player_Man/man.png");
+		LoadTexture("Full_Block",	"Resources/Sprites/Tiles/Terrain/full_block.png");
 	}
 
 	AssetManager::~AssetManager()
