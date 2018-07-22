@@ -3,6 +3,7 @@
 
 #include "SplashState.hpp"
 #include "DEFINITIONS.hpp"
+#include "MainMenuState.h"
 
 namespace ge
 {
@@ -20,9 +21,17 @@ namespace ge
 	{
 		m_Data->assets.LoadTexture(
 			"Splash State Background", 
-			SPLASH_SCENE_BACKGROUND_FILEPATH);
+			SPLASH_BACKGROUND);
 
-		m_Background.setTexture(*m_Data->assets.GetTexture("Splash State Background"));
+		auto texture = m_Data->assets.GetTexture("Splash State Background");
+		m_Background.setTexture(*texture);
+
+		// resize the background to fit any resolution
+		auto textureSize = texture->getSize();
+		auto scaleFactor = sf::Vector2f((float)SCREEN_WIDTH / textureSize.x, (float)SCREEN_HEIGHT / textureSize.y);
+		auto currentScaleFactor = m_Background.getScale();
+		auto newScaleFactor = sf::Vector2f(currentScaleFactor.x * scaleFactor.x, currentScaleFactor.y * scaleFactor.y);
+		m_Background.scale(newScaleFactor);
 	}
 
 	void SplashState::HandleInput()
@@ -40,10 +49,11 @@ namespace ge
 
 	void SplashState::Update(float deltaTime)
 	{
-		if (m_Clock.getElapsedTime().asSeconds() > SPLASH_STATE_SHOW_TIME)
+		if (m_Clock.getElapsedTime().asSeconds() > SPLASH_TIMEOUT)
 		{
 			// Switch to the Main Menu
 			std::cout << "Switch to the Main Menu" << std::endl;
+			m_Data->machine.AddState(StateRef(new MainMenuState(m_Data)), true);
 		}
 	}
 

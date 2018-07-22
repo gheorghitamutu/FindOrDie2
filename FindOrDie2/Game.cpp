@@ -9,8 +9,8 @@ namespace ge
 	{
 		m_Data->window.create(
 			sf::VideoMode(
-				(unsigned int)windowHeight, 
-				(unsigned int)windowWidth),
+				(unsigned int)windowWidth, 
+				(unsigned int)windowHeight),
 			gameTitle,
 			sf::Style::Close | sf::Style::Titlebar);
 		m_Data->machine.AddState(StateRef(new SplashState(m_Data)));
