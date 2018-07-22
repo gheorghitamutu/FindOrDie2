@@ -1,5 +1,6 @@
 #include "GameState.h"
 #include "DEFINITIONS.hpp"
+#include "PauseState.h"
 
 namespace ge
 {
@@ -19,8 +20,6 @@ namespace ge
 
 		delete m_pMap;
 		m_pMap = nullptr;
-
-		
 	}
 
 	void GameState::Init()
@@ -68,11 +67,10 @@ namespace ge
 				m_pPlayer->ProcessEvents(&event);
 
 				if (m_Data->input.IsKeyReleased(ge::InputKeys::Esc, &event))
-					m_GameState = STATE_PAUSE;
+					m_Data->machine.AddState(StateRef(new PauseState(m_Data)), false);
 				break;
 			case STATE_PAUSE:
-				if (m_Data->input.IsKeyReleased(ge::InputKeys::Esc, &event))
-					m_GameState = STATE_PLAYING;
+				// ..
 				break;
 			default:
 				break;
