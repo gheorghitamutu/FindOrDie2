@@ -2,8 +2,9 @@
 
 #include "Map.hpp"
 
-Map::Map() noexcept
+Map::Map(ge::AssetManager* assets) noexcept
 {
+	m_Assets = assets;
 }
 
 Key Map::GetKey(sf::Vector2f coords)
@@ -89,10 +90,6 @@ std::vector<Key> Map::GetNeighbors(Key key, unsigned int levels)
 
 Map::~Map()
 {
-}
-
-void Map::CleanUp()
-{
 	for (auto tile : m_TileBlocks)
 	{
 		delete tile.second;
@@ -110,11 +107,12 @@ void Map::GenerateMap()
 		for (int j = 0; j < m_MatrixTileSize; j++)
 		{
 			tile = new Tile(
-				"Full_Block", 
-				TileType::RockSolid, 
-				TileAppearance::Visible, 
-				TileUsage::Floor, 
-				TileState::Seen);
+				"Full_Block",
+				TileType::RockSolid,
+				TileAppearance::Visible,
+				TileUsage::Floor,
+				TileState::Seen,
+				m_Assets);
 
 			tile->GetBody()->setOrigin({ tileSize / 2, tileSize / 2 });
 

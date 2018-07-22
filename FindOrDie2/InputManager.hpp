@@ -19,15 +19,8 @@ namespace ge
 
 	class InputManager
 	{
-	private:
-		InputManager() noexcept;
-
 	public:
-		static InputManager* GetInstance()
-		{
-			static InputManager instance;
-			return &instance;
-		}
+		InputManager() noexcept;
 		~InputManager();
 
 		void Update();

@@ -34,7 +34,8 @@ enum TileState
 class Tile
 {
 public:
-	Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state);
+	Tile(std::string name, TileType type, TileAppearance appearance, 
+		TileUsage usage, TileState state, ge::AssetManager* assets);
 	~Tile();
 	sf::Sprite* GetBody();
 	bool IsVisible();

@@ -9,7 +9,7 @@
 class Player
 {
 public:
-	Player() noexcept;
+	Player(ge::AssetManager *assets, ge::InputManager* input) noexcept;
 	~Player();
 	void Update(float elapsedSec);
 	void Draw(sf::RenderWindow* pWindow);
@@ -68,5 +68,9 @@ private:
 
 private:
 	void SetAnimationFrame();
+
+private:
+	ge::AssetManager* m_Assets = nullptr;
+	ge::InputManager* m_Input = nullptr;
 };
 

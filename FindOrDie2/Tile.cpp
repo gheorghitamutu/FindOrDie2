@@ -1,9 +1,9 @@
 #include "Tile.hpp"
 
-Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state)
+Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state, ge::AssetManager* assets)
 {
 	m_Body = new sf::Sprite();
-	auto bodyTexture = ge::AssetManager::GetInstance()->GetTexture(name);
+	auto bodyTexture = assets->GetTexture(name);
 	if (bodyTexture != nullptr)
 	{
 		m_Body->setTexture(*bodyTexture);

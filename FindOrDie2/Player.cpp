@@ -1,18 +1,19 @@
 #include "Player.hpp"
 #include "Game.hpp"
 
-Player::Player() noexcept
+Player::Player(ge::AssetManager *assets, ge::InputManager* input) noexcept
 {
 	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
 	m_Body.setScale({ 1.0f, 1.0f });
 	m_Body.setPosition({ 0.0f, 0.0f });
 
 	m_pView = new sf::View();
-	m_pView->setSize({ (float)Game::windowHeight, (float)Game::windowWidth });
+	m_pView->setSize({ (float)ge::Game::windowHeight, (float)ge::Game::windowWidth });
 	m_pView->zoom(1.0f);
 	m_pView->setCenter({ 0,0 });
 
-	auto textureRequired = ge::AssetManager::GetInstance()->GetTexture("Player_Man");
+	m_Assets = assets;
+	auto textureRequired = m_Assets->GetTexture("Player_Man");
 	
 	for (int i = 0; i < int(AnimationIndex::Count); i++)
 	{
@@ -26,6 +27,8 @@ Player::Player() noexcept
 				m_NumberOfFrames,
 				m_HoldTime));
 	}
+
+	m_Input = input;
 }
 
 Player::~Player()
@@ -137,21 +140,19 @@ void Player::ProcessEvents(sf::Event * event)
 {
 	m_Direction = { 0, 0 };
 
-	auto input = ge::InputManager::GetInstance();
-
-	if (input->IsKeyPressed(ge::InputKeys::Up))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Up))
 	{
 		m_Direction.y = -1;
 	}
-	if (input->IsKeyPressed(ge::InputKeys::Down))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Down))
 	{
 		m_Direction.y = 1;
 	}
-	if (input->IsKeyPressed(ge::InputKeys::Left))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Left))
 	{
 		m_Direction.x = -1;
 	}
-	if (input->IsKeyPressed(ge::InputKeys::Right))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Right))
 	{
 		m_Direction.x = 1;
 	}
@@ -162,21 +163,21 @@ void Player::ProcessEvents(sf::Event * event)
 		m_Direction.y *= 2;
 	}
 
-	if (input->IsKeyPressed(ge::InputKeys::Right) && 
-		input->IsKeyPressed(ge::InputKeys::Left))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Right) && 
+		m_Input->IsKeyPressed(ge::InputKeys::Left))
 	{
 		m_Direction.x = 0;
 		m_Direction.y = 0;
 	}
 
-	if (input->IsKeyPressed(ge::InputKeys::Up) && 
-		input->IsKeyPressed(ge::InputKeys::Down))
+	if (m_Input->IsKeyPressed(ge::InputKeys::Up) && 
+		m_Input->IsKeyPressed(ge::InputKeys::Down))
 	{
 		m_Direction.x = 0;
 		m_Direction.y = 0;
 	}
 
-	if (input->IsKeyReleased(ge::InputKeys::C, event))
+	if (m_Input->IsKeyReleased(ge::InputKeys::C, event))
 	{
 		m_IsFocused = !m_IsFocused;
 	}

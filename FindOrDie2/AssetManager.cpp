@@ -11,6 +11,17 @@ namespace ge
 
 	AssetManager::~AssetManager()
 	{
+		for (auto item : m_Textures)
+		{
+			delete item.second;
+			item.second = nullptr;
+		}
+
+		for (auto item : m_Fonts)
+		{
+			delete item.second;
+			item.second = nullptr;
+		}
 	}
 
 	void AssetManager::LoadTexture(std::string name, std::string fileName)
@@ -54,20 +65,5 @@ namespace ge
 		auto font = m_Fonts[name];
 
 		return font != nullptr ? font : nullptr;
-	}
-
-	void AssetManager::CleanUp()
-	{
-		for (auto item : m_Textures)
-		{
-			delete item.second;
-			item.second = nullptr;
-		}
-
-		for (auto item : m_Fonts)
-		{
-			delete item.second;
-			item.second = nullptr;
-		}
 	}
 }

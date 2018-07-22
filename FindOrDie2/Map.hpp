@@ -45,19 +45,13 @@ namespace std {
 class Map
 {
 private:
-	Map() noexcept;
 	Key GetKey(sf::Vector2f coords);
 	std::vector<Key> GetNeighbors(Key key, unsigned int levels);
 
 public:
-	static Map* GetInstance()
-	{
-		static Map instance;
-		return &instance;
-	}
+	Map(ge::AssetManager* m_Assets) noexcept;
 	~Map();
 
-	void CleanUp();
 	void GenerateMap();
 	void Draw(sf::RenderWindow* pWindow);
 	void SetView(sf::View* pView);
@@ -75,5 +69,7 @@ private:
 	sf::Vector2<int> m_BlockSize = { 0,0 };
 
 	std::mutex m_mtx;
+
+	ge::AssetManager* m_Assets = nullptr;
 };
 

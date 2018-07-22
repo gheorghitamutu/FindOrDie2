@@ -2,50 +2,73 @@
 
 #include <iostream>
 #include <thread>
+#include <memory>
+#include <string>
 
 #include <SFML/Graphics.hpp>
 
 #include "Player.hpp"
 #include "Map.hpp"
+#include "StateMachine.hpp"
+#include "AssetManager.hpp"
+#include "InputManager.hpp"
 
-enum GameState
+namespace ge
 {
-	MainMenu,
-	CharacterSelection,
-	Running,
-	Pause,
-	Exit
-};
+	struct GameData
+	{
+		StateMachine machine;
+		sf::RenderWindow window;
+		AssetManager assets;
+		InputManager input;
+	};
 
-class Game
-{
-public:
-	Game() noexcept;
-	~Game();
-	void Run();
+	typedef std::shared_ptr<GameData> GameDataRef;
 
-public:
-	static const unsigned int windowHeight = 1920;
-	static const unsigned int windowWidth = 1080;
+	enum GameState
+	{
+		MainMenu,
+		CharacterSelection,
+		Running,
+		Pause,
+		Exit
+	};
 
-private:
-	bool ProcessEvents();
-	void Update(float deltaTime);
-	void Draw();
+	class Game
+	{
+	public:
+		Game() noexcept;
+		~Game();
 
-private:
-	sf::RenderWindow* m_pWindow = nullptr;
+	public:
+		static const unsigned int windowHeight = 1920;
+		static const unsigned int windowWidth = 1080;
 
-	Player* m_pPlayer = nullptr;
+	private:
+		void Run();
 
-	sf::View *m_pDefaultView = nullptr;
-	sf::View *m_pCurrentView = nullptr;
+		bool ProcessEvents();
+		void Update(float deltaTime);
+		void Draw();
 
-	std::string m_WindowTitle = "Game";
+	private:
+		Player* m_pPlayer = nullptr;
 
-	Map* m_pMap = nullptr;
+		sf::View *m_pDefaultView = nullptr;
+		sf::View *m_pCurrentView = nullptr;
 
-	GameState m_CurrentGameState = GameState::Running;
-	unsigned int m_MaxFPS = 60;
-};
+		std::string m_GameTitle = "FindOrDie2";
+
+		Map* m_pMap = nullptr;
+
+		GameState m_CurrentGameState = GameState::Running;
+		unsigned int m_MaxFPS = 60;
+
+		const float m_DeltaTime = 1.0f / 60.0f;
+
+		sf::Clock m_Clock;
+
+		GameDataRef m_Data = std::make_shared<GameData>();
+	};
+}
 
