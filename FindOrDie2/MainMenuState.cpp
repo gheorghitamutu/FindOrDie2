@@ -22,6 +22,8 @@ namespace ge
 		m_Data->assets.LoadTexture("Play Button", MAIN_MENU_PLAY_BUTTON);
 		m_Data->assets.LoadTexture("Game Title", MAIN_MENU_TITLE);
 
+		m_Data->assets.LoadFont("Main Font", MAIN_MENU_FONT);
+
 		auto backgroundTexture = m_Data->assets.GetTexture("Background");
 		m_Background.setTexture(*backgroundTexture);
 
@@ -32,19 +34,46 @@ namespace ge
 		auto newScaleFactor = sf::Vector2f(currentScaleFactor.x * scaleFactor.x, currentScaleFactor.y * scaleFactor.y);
 		m_Background.scale(newScaleFactor);
 
+		// play button
 		m_PlayButton.setTexture(*m_Data->assets.GetTexture("Play Button"));
 
-		// set play button position
-		m_PlayButton.setPosition(
-			(SCREEN_WIDTH / 2) - (m_PlayButton.getGlobalBounds().width / 2),
+		m_PlayButton.scale(newScaleFactor * 1.5f);
+		auto playButtonPosition = sf::Vector2f((SCREEN_WIDTH / 2) - (m_PlayButton.getGlobalBounds().width / 2),
 			(SCREEN_HEIGHT / 2) - (m_PlayButton.getGlobalBounds().height / 2));
+		m_PlayButton.setPosition(playButtonPosition);
 
+		// title position
 		m_Title.setTexture(*m_Data->assets.GetTexture("Game Title"));
-
-		// set game title position
-		m_Title.setPosition(
+		m_Title.scale(newScaleFactor * 2.5f);
+		auto titlePosition = sf::Vector2f(
 			(SCREEN_WIDTH / 2) - (m_Title.getGlobalBounds().width / 2),
-			m_Title.getGlobalBounds().height * 0.1);
+			(SCREEN_HEIGHT / 3) - (m_Title.getGlobalBounds().height / 2));
+		m_Title.setPosition(titlePosition);
+
+		// set fonts and texts
+		auto mainFont = m_Data->assets.GetFont("Main Font");
+
+		// title
+		m_TitleText.setFont(*mainFont);
+		m_TitleText.setString(GAME_TITLE);
+		m_TitleText.scale(newScaleFactor * 1.8f);
+		m_TitleText.setFillColor(m_Gray);
+	
+		auto titleTextPosition = sf::Vector2f(
+			m_Title.getPosition().x + m_Title.getGlobalBounds().width / 2 - m_TitleText.getGlobalBounds().width / 2,
+			m_Title.getPosition().y + m_Title.getGlobalBounds().height / 2 - m_TitleText.getGlobalBounds().height);
+		m_TitleText.setPosition(titleTextPosition);
+
+		// play button
+		m_PlayButtonText.setFont(*mainFont);
+		m_PlayButtonText.setString("PLAY");
+		m_PlayButtonText.scale(newScaleFactor * 1.5f);
+		m_PlayButtonText.setFillColor(sf::Color::White);
+
+		auto playButtonTextPosition = sf::Vector2f(
+			m_PlayButton.getPosition().x + m_PlayButton.getGlobalBounds().width / 2 - m_PlayButtonText.getGlobalBounds().width / 2,
+			m_PlayButton.getPosition().y + m_PlayButton.getGlobalBounds().height / 2 - m_PlayButtonText.getGlobalBounds().height);
+		m_PlayButtonText.setPosition(playButtonTextPosition);
 	}
 
 	void MainMenuState::HandleInput()
@@ -74,8 +103,12 @@ namespace ge
 		m_Data->window.clear();
 
 		m_Data->window.draw(m_Background);
-		m_Data->window.draw(m_PlayButton);
+
 		m_Data->window.draw(m_Title);
+		m_Data->window.draw(m_TitleText);
+
+		m_Data->window.draw(m_PlayButton);
+		m_Data->window.draw(m_PlayButtonText);
 
 		m_Data->window.display();
 	}

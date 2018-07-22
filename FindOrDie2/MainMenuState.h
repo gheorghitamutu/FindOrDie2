@@ -25,7 +25,11 @@ namespace ge
 		sf::Sprite m_Background;
 		
 		sf::Sprite m_PlayButton;
+		sf::Text m_PlayButtonText;
 
 		sf::Sprite m_Title;
+		sf::Text m_TitleText;
+
+		sf::Color m_Gray = sf::Color(128, 128, 128);
 	};
 }
