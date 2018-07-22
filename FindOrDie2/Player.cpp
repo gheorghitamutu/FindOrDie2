@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Game.hpp"
+#include "DEFINITIONS.hpp"
 
 Player::Player(ge::AssetManager *assets, ge::InputManager* input) noexcept
 {
@@ -8,7 +9,7 @@ Player::Player(ge::AssetManager *assets, ge::InputManager* input) noexcept
 	m_Body.setPosition({ 0.0f, 0.0f });
 
 	m_pView = new sf::View();
-	m_pView->setSize({ (float)ge::Game::windowHeight, (float)ge::Game::windowWidth });
+	m_pView->setSize({ SCREEN_HEIGHT, SCREEN_WIDTH });
 	m_pView->zoom(1.0f);
 	m_pView->setCenter({ 0,0 });
 

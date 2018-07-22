@@ -37,12 +37,8 @@ namespace ge
 	class Game
 	{
 	public:
-		Game() noexcept;
+		Game(float windowWidth, float windowHeight, std::string gameTitle) noexcept;
 		~Game();
-
-	public:
-		static const unsigned int windowHeight = 1920;
-		static const unsigned int windowWidth = 1080;
 
 	private:
 		void Run();
@@ -56,8 +52,6 @@ namespace ge
 
 		sf::View *m_pDefaultView = nullptr;
 		sf::View *m_pCurrentView = nullptr;
-
-		std::string m_GameTitle = "FindOrDie2";
 
 		Map* m_pMap = nullptr;
 

@@ -154,11 +154,13 @@
   <ItemGroup>
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="AssetManager.hpp" />
+    <ClInclude Include="DEFINITIONS.hpp" />
     <ClInclude Include="Game.hpp" />
     <ClInclude Include="InputManager.hpp" />
     <ClInclude Include="Map.hpp" />
     <ClInclude Include="Menu.hpp" />
     <ClInclude Include="Player.hpp" />
+    <ClInclude Include="SplashState.hpp" />
     <ClInclude Include="State.hpp" />
     <ClInclude Include="StateMachine.hpp" />
     <ClInclude Include="Tile.hpp" />
@@ -173,6 +175,7 @@
     <ClCompile Include="Map.cpp" />
     <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="SplashState.cpp" />
     <ClCompile Include="StateMachine.cpp" />
     <ClCompile Include="Tile.cpp" />
     <ClCompile Include="TileBlock.cpp" />

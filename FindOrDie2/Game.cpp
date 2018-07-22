@@ -1,15 +1,21 @@
 #include "Game.hpp"
 #include "AssetManager.hpp"
 #include "InputManager.hpp"
+#include "SplashState.hpp"
 
 namespace ge
 {
-	Game::Game() noexcept
+	Game::Game(float windowWidth, float windowHeight, std::string gameTitle) noexcept
 	{
 		m_Data->window.create(
-			sf::VideoMode(windowHeight, windowWidth), 
-			m_GameTitle,
+			sf::VideoMode(
+				(unsigned int)windowHeight, 
+				(unsigned int)windowWidth),
+			gameTitle,
 			sf::Style::Close | sf::Style::Titlebar);
+		m_Data->machine.AddState(StateRef(new SplashState(m_Data)));
+
+
 		m_Data->window.setFramerateLimit(m_MaxFPS);
 
 		m_Data->input.AddAction(ge::InputKeys::Up,		sf::Keyboard::Key::Up);
@@ -76,27 +82,14 @@ namespace ge
 
 			while (accumulator >= m_DeltaTime)
 			{
-				//m_Data->machine.GetActiveState()->HandleInput();
-				//m_Data->machine.GetActiveState()->Update(m_DeltaTime);
+				m_Data->machine.GetActiveState()->HandleInput();
+				m_Data->machine.GetActiveState()->Update(m_DeltaTime);
 
 				accumulator -= m_DeltaTime;
 			}
 
 			interpolation = accumulator / m_DeltaTime;
-			//m_Data->machine.GetActiveState()->Draw(interpolation);
-
-			// check fps
-			float fps = 1.0f / currentTime;
-			//std::cout << "\r" << fps ;
-
-			// check events
-			if (!ProcessEvents()) m_Data->window.close();
-
-			// update
-			Update(currentTime);
-
-			// draw/render
-			Draw();
+			m_Data->machine.GetActiveState()->Draw(interpolation);
 		}
 	}
 
