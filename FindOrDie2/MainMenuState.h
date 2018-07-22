@@ -23,12 +23,18 @@ namespace ge
 		GameDataRef m_Data;
 
 		sf::Sprite m_Background;
+
+		sf::Sprite m_TitleButton;
+		sf::Text m_TitleButtonText;
 		
 		sf::Sprite m_PlayButton;
 		sf::Text m_PlayButtonText;
 
-		sf::Sprite m_Title;
-		sf::Text m_TitleText;
+		sf::Sprite m_SettingsButton;
+		sf::Text m_SettingsButtonText;
+
+		sf::Sprite m_ExitButton;
+		sf::Text m_ExitButtonText;
 
 		sf::Color m_Gray = sf::Color(128, 128, 128);
 	};

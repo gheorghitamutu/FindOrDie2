@@ -5,10 +5,24 @@
 #define SCREEN_WIDTH 1024
 #define SCREEN_HEIGHT 768
 
-#define SPLASH_TIMEOUT 1
+#define MAIN_FONT "Resources/Fonts/kenvector_future_thin.ttf"
+
+#define SPLASH_TIMEOUT 3
 #define SPLASH_BACKGROUND "Resources/Sprites/Background/game_background_1.png"
 
 #define MAIN_MENU_BACKGROUND "Resources/Sprites/Background/game_background_2.png"
-#define MAIN_MENU_TITLE "Resources/Sprites/Menu/grey_button00.png"
+#define MAIN_MENU_TITLE_BUTTON "Resources/Sprites/Menu/grey_button00.png"
+#define MAIN_MENU_TITLE_BUTTON_TEXT GAME_TITLE
 #define MAIN_MENU_PLAY_BUTTON "Resources/Sprites/Menu/blue_button00.png"
-#define MAIN_MENU_FONT "Resources/Fonts/kenvector_future_thin.ttf"
+#define MAIN_MENU_PLAY_BUTTON_TEXT "Play"
+#define MAIN_MENU_SETTINGS_BUTTON "Resources/Sprites/Menu/yellow_button00.png"
+#define MAIN_MENU_SETTINGS_BUTTON_TEXT "Settings"
+#define MAIN_MENU_EXIT_BUTTON "Resources/Sprites/Menu/red_button00.png"
+#define MAIN_MENU_EXIT_BUTTON_TEXT "Exit"
+
+#define GAME_BACKGROUND "Resources/Sprites/Background/game_background_3.1.png"
+#define STATE_PLAYING 98
+#define STATE_PAUSE 97
+#define STATE_WON 96
+#define STATE_LOSE 95
+#define STATE_DRAW 94
