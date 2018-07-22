@@ -44,9 +44,6 @@ void Player::Update(float elapsedSec)
 
 	SetAnimationFrame();
 
-	// auto thumbstickState = InputManager::GetInstance()->GetThumbStickLeft;  // controller
-	// pos += thumbstickState * speed * elapsedSec;							   // controller
-
 	pos += m_Direction * m_DefaultSpeed * elapsedSec;
 
 	m_Animations[int(m_CurrentAnimation)].Update(elapsedSec);

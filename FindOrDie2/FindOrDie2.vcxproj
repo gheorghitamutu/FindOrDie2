@@ -156,6 +156,7 @@
     <ClInclude Include="AssetManager.hpp" />
     <ClInclude Include="DEFINITIONS.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameState.h" />
     <ClInclude Include="InputManager.hpp" />
     <ClInclude Include="MainMenuState.h" />
     <ClInclude Include="Map.hpp" />
@@ -169,6 +170,7 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="GameState.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="source.cpp" />
     <ClCompile Include="Game.cpp" />

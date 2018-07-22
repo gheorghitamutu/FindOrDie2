@@ -3,6 +3,7 @@
 
 #include "MainMenuState.h"
 #include "DEFINITIONS.hpp"
+#include "GameState.h"
 
 namespace ge
 {
@@ -131,6 +132,7 @@ namespace ge
 			if (m_Data->input.IsSpriteClicked(&m_PlayButton, sf::Mouse::Left, &m_Data->window))
 			{
 				std::cout << "Switch to the Game Screen" << std::endl;
+				m_Data->machine.AddState(StateRef(new GameState(m_Data)), true);
 			}
 
 			if (m_Data->input.IsSpriteClicked(&m_SettingsButton, sf::Mouse::Left, &m_Data->window))
