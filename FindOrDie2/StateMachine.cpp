@@ -1,8 +1,8 @@
 #include "StateMachine.hpp"
 
-namespace GameEngine
+namespace ge
 {
-	void GameEngine::StateMachine::AddState(StateRef newState, bool isReplacing)
+	void ge::StateMachine::AddState(StateRef newState, bool isReplacing)
 	{
 		m_IsAdding = true;
 		m_IsReplacing = isReplacing;
@@ -10,12 +10,12 @@ namespace GameEngine
 		m_NewState = std::move(newState);
 	}
 
-	void GameEngine::StateMachine::RemoveState()
+	void ge::StateMachine::RemoveState()
 	{
 		m_IsRemoving = true;
 	}
 
-	void GameEngine::StateMachine::ProcessStateChanges()
+	void ge::StateMachine::ProcessStateChanges()
 	{
 		if (m_IsRemoving && !m_States.empty())
 		{
@@ -49,7 +49,7 @@ namespace GameEngine
 		}
 	}
 
-	StateRef & GameEngine::StateMachine::GetActiveState()
+	StateRef & ge::StateMachine::GetActiveState()
 	{
 		return m_States.top();
 	}

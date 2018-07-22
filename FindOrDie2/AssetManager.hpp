@@ -4,7 +4,7 @@
 
 #include <SFML/Graphics.hpp>
 
-namespace GameEngine
+namespace ge
 {
 	class AssetManager
 	{

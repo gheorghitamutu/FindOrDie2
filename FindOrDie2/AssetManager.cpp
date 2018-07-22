@@ -1,6 +1,6 @@
 #include "AssetManager.hpp"
 
-namespace GameEngine
+namespace ge
 {
 	AssetManager::AssetManager()
 	{

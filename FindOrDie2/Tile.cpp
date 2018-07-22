@@ -3,7 +3,7 @@
 Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state)
 {
 	m_Body = new sf::Sprite();
-	auto bodyTexture = GameEngine::AssetManager::GetInstance()->GetTexture(name);
+	auto bodyTexture = ge::AssetManager::GetInstance()->GetTexture(name);
 	if (bodyTexture != nullptr)
 	{
 		m_Body->setTexture(*bodyTexture);

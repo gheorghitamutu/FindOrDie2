@@ -1,6 +1,6 @@
 #pragma once
 
-namespace GameEngine
+namespace ge
 {
 	class State
 	{

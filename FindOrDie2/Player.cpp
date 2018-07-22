@@ -12,7 +12,7 @@ Player::Player() noexcept
 	m_pView->zoom(1.0f);
 	m_pView->setCenter({ 0,0 });
 
-	auto textureRequired = GameEngine::AssetManager::GetInstance()->GetTexture("Player_Man");
+	auto textureRequired = ge::AssetManager::GetInstance()->GetTexture("Player_Man");
 	
 	for (int i = 0; i < int(AnimationIndex::Count); i++)
 	{
@@ -137,21 +137,21 @@ void Player::ProcessEvents(sf::Event * event)
 {
 	m_Direction = { 0, 0 };
 
-	auto input = InputManager::GetInstance();
+	auto input = ge::InputManager::GetInstance();
 
-	if (input->IsKeyPressed(InputKeys::Up))
+	if (input->IsKeyPressed(ge::InputKeys::Up))
 	{
 		m_Direction.y = -1;
 	}
-	if (input->IsKeyPressed(InputKeys::Down))
+	if (input->IsKeyPressed(ge::InputKeys::Down))
 	{
 		m_Direction.y = 1;
 	}
-	if (input->IsKeyPressed(InputKeys::Left))
+	if (input->IsKeyPressed(ge::InputKeys::Left))
 	{
 		m_Direction.x = -1;
 	}
-	if (input->IsKeyPressed(InputKeys::Right))
+	if (input->IsKeyPressed(ge::InputKeys::Right))
 	{
 		m_Direction.x = 1;
 	}
@@ -162,19 +162,21 @@ void Player::ProcessEvents(sf::Event * event)
 		m_Direction.y *= 2;
 	}
 
-	if (input->IsKeyPressed(InputKeys::Right) && input->IsKeyPressed(InputKeys::Left))
+	if (input->IsKeyPressed(ge::InputKeys::Right) && 
+		input->IsKeyPressed(ge::InputKeys::Left))
 	{
 		m_Direction.x = 0;
 		m_Direction.y = 0;
 	}
 
-	if (input->IsKeyPressed(InputKeys::Up) && input->IsKeyPressed(InputKeys::Down))
+	if (input->IsKeyPressed(ge::InputKeys::Up) && 
+		input->IsKeyPressed(ge::InputKeys::Down))
 	{
 		m_Direction.x = 0;
 		m_Direction.y = 0;
 	}
 
-	if (input->IsKeyReleased(InputKeys::C, event))
+	if (input->IsKeyReleased(ge::InputKeys::C, event))
 	{
 		m_IsFocused = !m_IsFocused;
 	}

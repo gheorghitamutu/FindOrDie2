@@ -5,7 +5,7 @@
 
 #include "State.hpp"
 
-namespace GameEngine
+namespace ge
 {
 	typedef std::unique_ptr<State> StateRef;
 

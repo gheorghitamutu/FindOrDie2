@@ -7,12 +7,12 @@ Game::Game() noexcept
 	m_pWindow = new sf::RenderWindow({ windowHeight, windowWidth }, m_WindowTitle);
 	m_pWindow->setFramerateLimit(m_MaxFPS);
 
-	InputManager::GetInstance()->AddAction(InputKeys::Up, sf::Keyboard::Key::Up);
-	InputManager::GetInstance()->AddAction(InputKeys::Down, sf::Keyboard::Key::Down);
-	InputManager::GetInstance()->AddAction(InputKeys::Left, sf::Keyboard::Key::Left);
-	InputManager::GetInstance()->AddAction(InputKeys::Right, sf::Keyboard::Key::Right);
-	InputManager::GetInstance()->AddAction(InputKeys::C, sf::Keyboard::Key::C);
-	InputManager::GetInstance()->AddAction(InputKeys::Esc, sf::Keyboard::Key::Escape);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::Up, sf::Keyboard::Key::Up);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::Down, sf::Keyboard::Key::Down);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::Left, sf::Keyboard::Key::Left);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::Right, sf::Keyboard::Key::Right);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::C, sf::Keyboard::Key::C);
+	ge::InputManager::GetInstance()->AddAction(ge::InputKeys::Esc, sf::Keyboard::Key::Escape);
 
 	m_pMap = Map::GetInstance();
 
@@ -43,7 +43,7 @@ Game::~Game()
 	delete m_pDefaultView;
 	m_pDefaultView = nullptr;
 
-	GameEngine::AssetManager::GetInstance()->CleanUp();
+	ge::AssetManager::GetInstance()->CleanUp();
 	Map::GetInstance()->CleanUp();
 }
 
@@ -90,11 +90,11 @@ bool Game::ProcessEvents()
 		case GameState::Running:
 			m_pPlayer->ProcessEvents(&event);
 
-			if (InputManager::GetInstance()->IsKeyReleased(InputKeys::Esc, &event))
+			if (ge::InputManager::GetInstance()->IsKeyReleased(ge::InputKeys::Esc, &event))
 				m_CurrentGameState = GameState::Pause;
 			break;
 		case GameState::Pause:
-			if (InputManager::GetInstance()->IsKeyReleased(InputKeys::Esc, &event))
+			if (ge::InputManager::GetInstance()->IsKeyReleased(ge::InputKeys::Esc, &event))
 				m_CurrentGameState = GameState::Running;
 			break;
 		default:
