@@ -6,47 +6,55 @@
 
 #include "AssetManager.hpp"
 
-enum TileType
+enum tile_type
 {
-	RockSolid,
-	Liquid,
-	Gas
+	rock_solid,
+	liquid,
+	gas
 };
 
-enum TileAppearance
+enum tile_appearance
 {
-	Visible,
-	Invisible
+	visible,
+	invisible
 };
 
-enum TileUsage
+enum tile_usage
 {
-	Floor,
-	Wall
+	land,
+	wall
 };
 
-enum TileState
+enum tile_state
 {
-	Seen,
-	Hidden
+	seen,
+	hidden
 };
 
-class Tile
+class tile
 {
 public:
-	Tile(std::string name, TileType type, TileAppearance appearance, 
-		TileUsage usage, TileState state, ge::AssetManager* assets);
-	~Tile();
-	sf::Sprite* GetBody();
-	bool IsVisible();
+	tile(const std::string& name, tile_type type, tile_appearance appearance, 
+		tile_usage usage, tile_state state, const std::shared_ptr<ge::asset_manager>& assets);
+	
+	tile(const tile& other) = default;
+	tile(tile&& other) noexcept = default;
+	explicit tile(tile* other);
+	tile& operator=(const tile& other) = default;
+	tile& operator=(tile&& other) noexcept = default;
+	
+	~tile() = default;
+
+	std::shared_ptr<sf::Sprite> get_body() const;
+	bool is_visible() const;
 
 private:
-	sf::Sprite* m_Body = nullptr;
-	std::vector<float> m_CollisionPoints;
+	std::shared_ptr<sf::Sprite> body_;
+	std::vector<float> collision_points_;
 
-	TileType m_Type = TileType::RockSolid;
-	TileAppearance m_Appearance = TileAppearance::Visible;
-	TileUsage m_Usage = TileUsage::Floor;
-	TileState m_State = TileState::Seen;
+	tile_type type_ = rock_solid;
+	tile_appearance appearance_ = visible;
+	tile_usage usage_ = land;
+	tile_state state_ = seen;
 };
 

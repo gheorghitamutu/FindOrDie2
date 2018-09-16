@@ -6,71 +6,76 @@
 #include "AssetManager.hpp"
 #include "Animation.hpp"
 
-class Player
+class player
 {
 public:
-	Player(ge::AssetManager *assets, ge::InputManager* input) noexcept;
-	~Player();
-	void Update(float elapsedSec);
-	void Draw(sf::RenderWindow* pWindow);
-	sf::Vector2f GetPosition() const;
-	void ChangeFocus();
-	sf::View* GetView();
-	void ProcessEvents(sf::Event* event);
+	player(const std::shared_ptr<ge::asset_manager>& assets, std::shared_ptr<ge::input_manager> input) noexcept;
+
+	player(const player& other) = default;
+	player(player&& other) noexcept = default;
+	player& operator=(const player& other) = default;
+	player& operator=(player&& other) noexcept = default;
+
+	~player() = default;
+
+	void update(float elapsed_sec);
+	void draw(sf::RenderWindow* p_window) const;
+	sf::Vector2f get_position() const;
+	void change_focus();
+	std::shared_ptr<sf::View> get_view() const;
+	void process_events(const std::shared_ptr<sf::Event>& event);
 
 private:
-	sf::Sprite m_Body;
-	static constexpr float m_TextureSize = 80.0f;
-	sf::Vector2f m_Direction = { 0, 0 };
-	static constexpr float m_DefaultSpeed = 80.0f;
-	static constexpr float m_WalkingSpeed = 1.1f;
-	bool m_IsFocused = false;
-	sf::Vector2<bool> m_ViewCentered = { false, false };
-	sf::View* m_pView = nullptr;
-	float m_AmountToMoveView = 3.f;
-	int m_ErrorRatePosition = 2;
+	sf::Sprite body_;
+	static constexpr float texture_size = 80.0f;
+	sf::Vector2f direction_ = { 0, 0 };
+	static constexpr float default_speed = 80.0f;
+	static constexpr float walking_speed = 1.1f;
+	bool is_focused_ = false;
+	sf::Vector2<bool> view_centered_ = { false, false };
+	std::shared_ptr<sf::View> p_view_;
+	float amount_to_move_view_ = 3.f;
+	int error_rate_position_ = 2;
 
 public:
-	enum class AnimationIndex
+	enum class animation_index
 	{
-		WalkingSouth,
-		WalkingWest,
-		WalkingEast,
-		WalkingNorth,
-		RunningSouth,
-		RunningWest,
-		RunningEast,
-		RunningNorth,
-		IdleSouth,
-		IdleWest,
-		IdleEast,
-		IdleNorth,
-		WalkingSouthWest,
-		WalkingNorthWest,
-		WalkingSouthEast,
-		WalkingNorthEast,
-		RunningSouthWest,
-		RunningNorthWest,
-		RunningSouthEast,
-		RunningNorthEast,
-		IdleSouthWest,
-		IdleNorthWest,
-		IdleSouthEast,
-		IdleNorthEast,
-		Count
+		walking_south,
+		walking_west,
+		walking_east,
+		walking_north,
+		running_south,
+		running_west,
+		running_east,
+		running_north,
+		idle_south,
+		idle_west,
+		idle_east,
+		idle_north,
+		walking_south_west,
+		walking_north_west,
+		walking_south_east,
+		walking_north_east,
+		running_south_west,
+		running_north_west,
+		running_south_east,
+		running_north_east,
+		idle_south_west,
+		idle_north_west,
+		idle_south_east,
+		idle_north_east,
+		count
 	};
 
 private:
-	std::vector<Animation> m_Animations;
-	AnimationIndex m_CurrentAnimation = AnimationIndex::IdleSouth;
-	int m_NumberOfFrames = 7;
-	float m_HoldTime = 0.1f;
+	void set_animation_frame();
 
-private:
-	void SetAnimationFrame();
+	std::vector<animation> animations_;
+	animation_index current_animation_ = animation_index::idle_south;
+	int number_of_frames_ = 7;
+	float hold_time_ = 0.1f;
 
-private:
-	ge::AssetManager* m_Assets = nullptr;
-	ge::InputManager* m_Input = nullptr;
+	std::shared_ptr<ge::asset_manager> assets_;
+	std::shared_ptr<ge::input_manager> input_;
 };
 

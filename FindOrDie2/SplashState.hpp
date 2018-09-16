@@ -7,23 +7,32 @@
 
 namespace ge
 {
-	class SplashState : public State
+	class splash_state : public state
 	{
 	public:
-		SplashState(GameDataRef data);
-		~SplashState();
+		explicit splash_state(const std::shared_ptr<game_data>& data);
 
-		void Init();
+		splash_state(const splash_state& other) = default;
+		splash_state(splash_state&& other) noexcept = default;
+		splash_state& operator=(const splash_state& other) = default;
+		splash_state& operator=(splash_state&& other) noexcept = default;
 
-		void HandleInput();
-		void Update(float deltaTime);
-		void Draw(float deltaTime);
+		~splash_state() = default;
+
+		void init() override;
+
+		void handle_input() override;
+		void update(float delta_time) override;
+		void draw() override;
+
+		void pause() override;
+		void resume() override;
 
 	private:
-		GameDataRef m_Data;
+		std::shared_ptr<game_data> data_;
 
-		sf::Clock m_Clock;
+		sf::Clock clock_;
 
-		sf::Sprite m_Background;
+		sf::Sprite background_;
 	};
 }

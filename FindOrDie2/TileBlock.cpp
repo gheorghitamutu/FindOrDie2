@@ -1,14 +1,6 @@
 #include "TileBlock.hpp"
 
-TileBlock::TileBlock() noexcept
+std::shared_ptr<std::vector<std::shared_ptr<tile>>> tile_block::get_tiles() const
 {
-}
-
-TileBlock::~TileBlock()
-{
-}
-
-std::vector<Tile*>* TileBlock::GetTiles()
-{
-	return &m_Tiles;
+	return m_tiles_;
 }

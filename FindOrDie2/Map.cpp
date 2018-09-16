@@ -1,207 +1,203 @@
-#include <iostream>
+#include <utility>
 
 #include "Map.hpp"
 
-Map::Map(ge::AssetManager* assets) noexcept
+Map::Map(std::shared_ptr<ge::asset_manager> assets) noexcept :
+	assets_(std::move(assets))
 {
-	m_Assets = assets;
 }
 
-Key Map::GetKey(sf::Vector2f coords)
+Map::Map(Map* other)
 {
-	float xKey = 0;
+}
 
-	if (m_ViewSize.x != 0)
+ge::key Map::get_key(const sf::Vector2f coords) const
+{
+	float x_key = 0;
+
+	if (view_size_.x != 0)
 	{
-		xKey = coords.x / m_BlockSize.x;
+		x_key = coords.x / block_size_.x;
 		
-		if (xKey < 0) xKey -= 1;
-		else xKey += 1;
+		if (x_key < 0) x_key -= 1;
+		else x_key += 1;
 	}
 
-	float yKey = 0;
+	float y_key = 0;
 
-	if (m_ViewSize.y != 0)
+	if (view_size_.y != 0)
 	{
-		yKey = coords.y / m_BlockSize.y;
+		y_key = coords.y / block_size_.y;
 
-		if (yKey < 0) yKey -= 1;
-		else yKey += 1;
+		if (y_key < 0) y_key -= 1;
+		else y_key += 1;
 	}
 	
-	return { (int)(xKey), (int)(yKey) };
+	return { static_cast<int>(x_key), static_cast<int>(y_key) };
 }
 
-std::vector<Key> Map::GetNeighbors(Key key, unsigned int levels)
+std::vector<ge::key> Map::get_neighbors(const ge::key key, const unsigned int levels) const
 {
-	std::vector<Key> blocksCoords;
+	std::vector<ge::key> blocks_coords;
 
 	// compute lowest x and y coords
-	int lowX = key.x - levels;
-	int lowY = key.y - levels;
+	int low_x = key.x - levels;
+	int low_y = key.y - levels;
 
 	// compute highest x and y coords
-	int highX = key.x + levels;
-	int highY = key.y + levels;
+	int high_x = key.x + levels;
+	int high_y = key.y + levels;
 
 	// if neighbors pass from one Q to another (from Q1 to Q2, from Q3 to Q4, etc)
 	// make sure you handle the transition skipping (0,0), (0,1), (1,0), (-1,0), (0,-1)
 	// as the key lowest values for Qs are (1,1), (-1,1), (1,-1), (-1,-1)
 	// and increase all the neighbors from that side with 1 << (0, 1) -> (1,2) >>
-	
-	int absX = abs(key.x) - levels;
-	int absY = abs(key.y) - levels;
 
-	if (absX <= 1 || absY <= 1)
+	const int abs_x = abs(key.x) - levels;
+	const int abs_y = abs(key.y) - levels;
+
+	if (abs_x <= 1 || abs_y <= 1)
 	{
 		// transition Q1 or Q4 to Q2 or Q3
-		if (key.x > 0 && lowX <= 0) lowX--;
+		if (key.x > 0 && low_x <= 0) low_x--;
 
 		// transition Q2 or Q3 to Q1 or Q4
-		if (key.x < 0 && highX >= 0) highX++;
+		if (key.x < 0 && high_x >= 0) high_x++;
 
 		// transition Q1 or Q2 to Q3 or Q4
-		if (key.y > 0 && lowY <= 0)	lowY--;
+		if (key.y > 0 && low_y <= 0)	low_y--;
 
 		// transition Q3 or Q4 to Q1 or Q2
-		if (key.y < 0 && highY >= 0) highY++;
+		if (key.y < 0 && high_y >= 0) high_y++;
 	}
 
 
 	// previously increasing the limits if transitions are happening
 	// we can now ignore every pair with 0s (0,1), (1,0), (-1,0), (0,-1)
 	// and add all the others
-	int indexX = lowX;
-	int indexY = lowY;
-	for (; indexX <= highX; indexX++)
+	auto index_x = low_x;
+	auto index_y = low_y;
+	for (; index_x <= high_x; index_x++)
 	{
-		indexY = lowY;
-		for (; indexY <= highY; indexY++)
+		for (; index_y <= high_y; index_y++)
 		{
-			Key blockKey = { indexX, indexY };
-			if (indexX != 0 && indexY != 0)
-					blocksCoords.emplace_back(blockKey);
+			ge::key block_key = { index_x, index_y };
+			if (index_x != 0 && index_y != 0)
+					blocks_coords.emplace_back(block_key);
 		}
+
+		index_y = low_y;
 	}
 
-	return blocksCoords;
+	return blocks_coords;
 }
 
-
-Map::~Map()
+void Map::generate_map()
 {
-	for (auto tile : m_TileBlocks)
+	for (auto i = 0ULL; i < matrix_tile_size_; i++)
 	{
-		delete tile.second;
-		tile.second = nullptr;
-	}
-}
-
-void Map::GenerateMap()
-{
-
-	Tile* tile = nullptr;
-
-	for (int i = 0; i < m_MatrixTileSize; i++)
-	{
-		for (int j = 0; j < m_MatrixTileSize; j++)
+		for (auto j = 0ULL; j < matrix_tile_size_; j++)
 		{
-			tile = new Tile(
-				"Full_Block",
-				TileType::RockSolid,
-				TileAppearance::Visible,
-				TileUsage::Floor,
-				TileState::Seen,
-				m_Assets);
+			auto this_tile = 
+				std::make_shared<tile>(tile(
+					"Full_Block",
+					rock_solid,
+					visible,
+					land,
+					seen,
+					assets_));
 
-			tile->GetBody()->setOrigin({ tileSize / 2, tileSize / 2 });
+			this_tile->get_body()->setOrigin({
+					static_cast<float>(tile_size) / 2.f, 
+					static_cast<float>(tile_size) / 2.f });
 
 			// flat surface formula
-			auto tilePositionX = j * 32.0f;
-			auto tilePositionY = i * 16.0f + j * 16.0f;
-			tile->GetBody()->setPosition({ tilePositionX,  tilePositionY});
+			const auto tile_position_x = j * 32.0f;
+			const auto tile_position_y = i * 16.0f + j * 16.0f;
+			this_tile->get_body()->setPosition({ tile_position_x,  tile_position_y});
 
-			Key tileChunkPosition = GetKey({ tilePositionX, tilePositionY });
+			ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y });
 
-			m_mtx.lock();
+			//mtx_.lock();
 
 			// you lock the inserting operation in order to draw while generating the map
 			{
-				if (m_TileBlocks.find(tileChunkPosition) == m_TileBlocks.end())
+				if (tile_blocks_.find(tile_chunk_position) == tile_blocks_.end())
 				{
-					m_TileBlocks.insert({ tileChunkPosition, new TileBlock() });
+					tile_blocks_.insert({ tile_chunk_position, std::make_shared<tile_block>() });
 				}
 
-				m_TileBlocks[tileChunkPosition]->GetTiles()->emplace_back(tile);
+				tile_blocks_[tile_chunk_position]->get_tiles()->emplace_back(this_tile);
 			}
 			// you unlock it after you insert a tile
 
-			m_mtx.unlock();
+			//mtx_.unlock();
 		}
 	}
 }
 
-void Map::Draw(sf::RenderWindow * pWindow)
+void Map::draw(sf::RenderWindow* p_window)
 {
-	auto viewCenter = m_pCurrentView->getCenter();
+	const auto view_center = p_current_view_->getCenter();
 
-	Key chunkPosition = GetKey(viewCenter);
+	const auto chunk_position = get_key(view_center);
 
-	std::vector<Key> chunkIndentifiers = GetNeighbors(chunkPosition, 1);
+	auto chunk_identifiers = get_neighbors(chunk_position, 1);
 
-	m_mtx.lock();
+	// mtx_.lock();
 
 	// you lock the query operation in order to draw on the screen only what's already
 	// generated and required for the current view
 
 	// you get all tiles from all blocks in the view center into one vector of tiles
-	std::vector<Tile*> tiles;
+	std::vector<std::shared_ptr<tile>> tiles;
 	{
-		for (auto &chunkId : chunkIndentifiers)
+		for (auto &chunk_id : chunk_identifiers)
 		{
-			auto tileBlock = m_TileBlocks.find(chunkId);
-			if (tileBlock != m_TileBlocks.end())
+			auto tile_block = tile_blocks_.find(chunk_id);
+
+			if (tile_block != tile_blocks_.end())
 			{
-				auto blockTiles = tileBlock->second->GetTiles();
-				tiles.insert(tiles.end(), blockTiles->begin(), blockTiles->end());
+				auto block_tiles = tile_block->second->get_tiles();
+				tiles.insert(tiles.end(), block_tiles->begin(), block_tiles->end());
 			}
 		}
 
 		// then you sort the tiles in order to draw them isometric and not overlap them
-		std::sort(tiles.begin(), tiles.end(), [](Tile* a, Tile* b)
-		{	
-			auto aBody = a->GetBody();
-			auto bBody = b->GetBody();
-			auto aPos = aBody->getPosition();
-			auto bPos = bBody->getPosition();
+		std::sort(tiles.begin(), tiles.end(), [](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
+		{
+			const auto a_body = a->get_body();
+			const auto b_body = b->get_body();
+			const auto a_pos = a_body->getPosition();
+			const auto b_pos = b_body->getPosition();
 
-			return aPos.y == bPos.y ? aPos.x > bPos.x : aPos.y < bPos.y;
+			return a_pos.y == b_pos.y ? a_pos.x > b_pos.x : a_pos.y < b_pos.y;
 		});
 
 		// draw the sorted tiles
-		for (auto tile : tiles)
+		for (const auto& tile : tiles)
 		{
-			pWindow->draw(*tile->GetBody());
+			p_window->draw(*tile->get_body());
 		}
 	}
 	// you unlock it
 
-	m_mtx.unlock();
+	// mtx_.unlock();
 }
 
-void Map::SetView(sf::View * pView)
+void Map::set_view(const std::shared_ptr<sf::View>& p_view)
 {
-	m_pCurrentView = pView;
+	p_current_view_ = p_view;
 
-	m_ViewSize = m_pCurrentView->getSize();
+	view_size_ = p_current_view_->getSize();
 
 	// tiles contained by a block relative to view size and tile size
-	m_BlockMaxTiles = { 
-		(m_ViewSize.x == 0) ? 0 : (int)(m_ViewSize.x / tileSize / 2),
-		(m_ViewSize.x == 0) ? 0 : (int)(m_ViewSize.y / tileSize / 2) };
+	block_max_tiles_ = { 
+		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / tile_size / 2),
+		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.y / tile_size / 2) };
 
 	// block size relative to view size (1/4 view size)
-	m_BlockSize = { 
-		(m_ViewSize.x == 0) ? 0 : (int)(m_ViewSize.x / 2),
-		(m_ViewSize.y == 0) ? 0 : (int)(m_ViewSize.y / 2) };
+	block_size_ = { 
+		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / 2),
+		(view_size_.y == 0) ? 0 : static_cast<int>(view_size_.y / 2) };
 }

@@ -2,279 +2,279 @@
 #include "Game.hpp"
 #include "DEFINITIONS.hpp"
 
-Player::Player(ge::AssetManager *assets, ge::InputManager* input) noexcept
+#include <iostream>
+
+player::player(const std::shared_ptr<ge::asset_manager>& assets, const std::shared_ptr<ge::input_manager> input) noexcept
 {
-	m_Body.setOrigin(m_TextureSize / 2, m_TextureSize / 2);
-	m_Body.setScale({ 1.0f, 1.0f });
-	m_Body.setPosition({ 0.0f, 0.0f });
+	body_.setOrigin(texture_size / 2, texture_size / 2);
+	body_.setScale({ 1.0f, 1.0f });
+	body_.setPosition({ 0.0f, 0.0f });
 
-	m_pView = new sf::View();
-	m_pView->setSize({ SCREEN_HEIGHT, SCREEN_WIDTH });
-	m_pView->zoom(1.0f);
-	m_pView->setCenter({ 0,0 });
+	p_view_ = std::make_shared<sf::View>(sf::View());
+	p_view_->setSize({ SCREEN_HEIGHT, SCREEN_WIDTH });
+	p_view_->zoom(1.0f);
+	p_view_->setCenter({ 0,0 });
 
-	m_Assets = assets;
-	auto textureRequired = m_Assets->GetTexture("Player_Man");
+	assets_ = assets;
+	const auto texture_required = assets_->get_texture("Player_Man");
 	
-	for (int i = 0; i < int(AnimationIndex::Count); i++)
+	for (auto i = 0; i < int(animation_index::count); i++)
 	{
-		m_Animations.emplace_back(
-			Animation(
-				(int)m_TextureSize, 
-				(int)(i*m_TextureSize), 
-				(int)m_TextureSize, 
-				(int)m_TextureSize, 
-				textureRequired,
-				m_NumberOfFrames,
-				m_HoldTime));
+		animations_.emplace_back(
+			animation(
+				static_cast<int>(texture_size), 
+				static_cast<int>(i * texture_size), 
+				static_cast<int>(texture_size), 
+				static_cast<int>(texture_size), 
+				texture_required,
+				number_of_frames_,
+				hold_time_));
 	}
 
-	m_Input = input;
+	input_ = input;
 }
 
-Player::~Player()
-{
-	delete m_pView;
-	m_pView = nullptr;
-}
+void player::update(const float elapsed_sec)
+{	
+	auto pos = body_.getPosition();
 
-void Player::Update(float elapsedSec)
-{
-	auto pos = m_Body.getPosition();
+	set_animation_frame();
 
-	SetAnimationFrame();
+	pos += direction_ * default_speed * elapsed_sec;
 
-	pos += m_Direction * m_DefaultSpeed * elapsedSec;
+	animations_[int(current_animation_)].update(elapsed_sec);
+	animations_[int(current_animation_)].apply_to_sprite(&body_);
 
-	m_Animations[int(m_CurrentAnimation)].Update(elapsedSec);
-	m_Animations[int(m_CurrentAnimation)].ApplyToSprite(&m_Body);
+	body_.setPosition(pos);
 
-	m_Body.setPosition(pos);
-
-	if (m_IsFocused)
+	if (is_focused_)
 	{
-		auto playerPosition = m_Body.getPosition();
-		auto viewPosition = m_pView->getCenter();
+		const auto player_position = body_.getPosition();
+		const auto view_position = p_view_->getCenter();
 
 		// you try guessing that the new view position will be the player's one
-		sf::Vector2f viewNewPosition = playerPosition;
+		auto view_new_position = player_position;
 
 		// the player has the view already centered on him
-		if (m_ViewCentered.x == true && m_ViewCentered.y == true)
+		if (view_centered_.x && view_centered_.y)
 		{
-			m_pView->setCenter(playerPosition);
+			p_view_->setCenter(player_position);
 		}
 		else // the view is not centered on the player
 		{
-			auto deltaDistance = playerPosition - viewPosition;
-			deltaDistance.x = abs(deltaDistance.x);
-			deltaDistance.y = abs(deltaDistance.y);
+			auto delta_distance = player_position - view_position;
+			delta_distance.x = abs(delta_distance.x);
+			delta_distance.y = abs(delta_distance.y);
 
 			// the distance from the view center to the player can be neglected
-			if (deltaDistance.x < m_ErrorRatePosition && deltaDistance.y < m_ErrorRatePosition)
+			if (delta_distance.x < error_rate_position_ && delta_distance.y < error_rate_position_)
 			{
-				m_ViewCentered = { true, true };
-				viewNewPosition = { playerPosition.x, playerPosition.y };
+				view_centered_ = { true, true };
+				view_new_position = { player_position.x, player_position.y };
 			}
 			else // the distance from the view center to the player is noticeable
 			{
-				if (deltaDistance.x > m_ErrorRatePosition) // x axis is too big
+				if (delta_distance.x > error_rate_position_) // x axis is too big
 				{
-					if ((int)viewPosition.x > (int)playerPosition.x)
-						viewNewPosition.x = viewPosition.x - m_AmountToMoveView;
-					else if ((int)viewPosition.x < (int)playerPosition.x)
-						viewNewPosition.x = viewPosition.x + m_AmountToMoveView;
+					if (static_cast<int>(view_position.x) > static_cast<int>(player_position.x))
+						view_new_position.x = view_position.x - amount_to_move_view_;
+					else if (static_cast<int>(view_position.x) < static_cast<int>(player_position.x))
+						view_new_position.x = view_position.x + amount_to_move_view_;
 				}
 
-				if (deltaDistance.y > m_ErrorRatePosition) // y axis is too big
+				if (delta_distance.y > error_rate_position_) // y axis is too big
 				{
-					if ((int)viewPosition.y > (int)playerPosition.y)
-						viewNewPosition.y = viewPosition.y - m_AmountToMoveView;
-					else if ((int)viewPosition.y < (int)playerPosition.y)
-						viewNewPosition.y = viewPosition.y + m_AmountToMoveView;
+					if (static_cast<int>(view_position.y) > static_cast<int>(player_position.y))
+						view_new_position.y = view_position.y - amount_to_move_view_;
+					else if (static_cast<int>(view_position.y) < static_cast<int>(player_position.y))
+						view_new_position.y = view_position.y + amount_to_move_view_;
 				}
 
 				// so the view is not yet centered on the player
-				m_ViewCentered = { false, false };
+				view_centered_ = { false, false };
 			}
 
 			// correct the view center bringing it close to the player
-			m_pView->setCenter(viewNewPosition);
+			p_view_->setCenter(view_new_position);
 		}
 	}
 }
 
-void Player::Draw(sf::RenderWindow* pWindow)
+void player::draw(sf::RenderWindow* p_window) const
 {
-	auto viewCenter = m_pView->getCenter();
-	auto viewSize = m_pView->getSize();
+	const auto view_center = p_view_->getCenter();
+	const auto view_size = p_view_->getSize();
 
-	sf::FloatRect rectBounds;
-	rectBounds.left = viewCenter.x - viewSize.x / 2.f;
-	rectBounds.top = viewCenter.y - viewSize.y / 2.f;
-	rectBounds.width = viewSize.x;
-	rectBounds.height = viewSize.y;
+	sf::FloatRect rect_bounds;
+	rect_bounds.left = view_center.x - view_size.x / 2.f;
+	rect_bounds.top = view_center.y - view_size.y / 2.f;
+	rect_bounds.width = view_size.x;
+	rect_bounds.height = view_size.y;
 
-	if(m_Body.getGlobalBounds().intersects(rectBounds))
-		pWindow->draw(m_Body);
-}
-
-sf::Vector2f Player::GetPosition() const
-{
-	return m_Body.getPosition();
-}
-
-void Player::ChangeFocus()
-{
-	m_IsFocused = !m_IsFocused;
-}
-
-sf::View * Player::GetView()
-{
-	return m_pView;
-}
-
-void Player::ProcessEvents(sf::Event * event)
-{
-	m_Direction = { 0, 0 };
-
-	if (m_Input->IsKeyPressed(ge::InputKeys::Up))
+	if (body_.getGlobalBounds().intersects(rect_bounds))
 	{
-		m_Direction.y = -1;
+		p_window->draw(body_);
 	}
-	if (m_Input->IsKeyPressed(ge::InputKeys::Down))
+}
+
+sf::Vector2f player::get_position() const
+{
+	return body_.getPosition();
+}
+
+void player::change_focus()
+{
+	is_focused_ = !is_focused_;
+}
+
+std::shared_ptr<sf::View> player::get_view() const
+{
+	return p_view_;
+}
+
+void player::process_events(const std::shared_ptr<sf::Event>& event)
+{
+	direction_ = { 0, 0 };
+
+	if (input_->is_key_pressed(ge::input_keys::up))
 	{
-		m_Direction.y = 1;
+		direction_.y = -1;
 	}
-	if (m_Input->IsKeyPressed(ge::InputKeys::Left))
+	if (input_->is_key_pressed(ge::input_keys::down))
 	{
-		m_Direction.x = -1;
+		direction_.y = 1;
 	}
-	if (m_Input->IsKeyPressed(ge::InputKeys::Right))
+	if (input_->is_key_pressed(ge::input_keys::left))
 	{
-		m_Direction.x = 1;
+		direction_.x = -1;
+	}
+	if (input_->is_key_pressed(ge::input_keys::right))
+	{
+		direction_.x = 1;
 	}
 
 	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::LShift))
 	{
-		m_Direction.x *= 2;
-		m_Direction.y *= 2;
+		direction_.x *= 2;
+		direction_.y *= 2;
 	}
 
-	if (m_Input->IsKeyPressed(ge::InputKeys::Right) && 
-		m_Input->IsKeyPressed(ge::InputKeys::Left))
+	if (input_->is_key_pressed(ge::input_keys::right) && 
+		input_->is_key_pressed(ge::input_keys::left))
 	{
-		m_Direction.x = 0;
-		m_Direction.y = 0;
+		direction_.x = 0;
+		direction_.y = 0;
 	}
 
-	if (m_Input->IsKeyPressed(ge::InputKeys::Up) && 
-		m_Input->IsKeyPressed(ge::InputKeys::Down))
+	if (input_->is_key_pressed(ge::input_keys::up) && 
+		input_->is_key_pressed(ge::input_keys::down))
 	{
-		m_Direction.x = 0;
-		m_Direction.y = 0;
+		direction_.x = 0;
+		direction_.y = 0;
 	}
 
-	if (m_Input->IsKeyReleased(ge::InputKeys::C, event))
+	if (input_->is_key_released(ge::input_keys::c, event))
 	{
-		m_IsFocused = !m_IsFocused;
+		is_focused_ = !is_focused_;
 	}
 }
 
-void Player::SetAnimationFrame()
+void player::set_animation_frame()
 {
-	if (m_Direction.x == 0.0f && m_Direction.y > 0.0f)
+	if (direction_.x == 0.0f && direction_.y > 0.0f)
 	{
-		if (m_Direction.y > m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningSouth;
+		if (direction_.y > walking_speed)
+			current_animation_ = animation_index::running_south;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingSouth;
+			current_animation_ = animation_index::walking_south;
 	}
-	else if (m_Direction.x > 0.0f && m_Direction.y > 0.0f)
+	else if (direction_.x > 0.0f && direction_.y > 0.0f)
 	{
-		if (m_Direction.x > m_WalkingSpeed && m_Direction.y > m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningSouthEast;
+		if (direction_.x > walking_speed && direction_.y > walking_speed)
+			current_animation_ = animation_index::running_south_east;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingSouthEast;
+			current_animation_ = animation_index::walking_south_east;
 	}
-	else if (m_Direction.x > 0.0f && m_Direction.y == 0.0f)
+	else if (direction_.x > 0.0f && direction_.y == 0.0f)
 	{
-		if (m_Direction.x > m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningEast;
+		if (direction_.x > walking_speed)
+			current_animation_ = animation_index::running_east;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingEast;
+			current_animation_ = animation_index::walking_east;
 	}
-	else if (m_Direction.x < 0.0f && m_Direction.y > 0.0f)
+	else if (direction_.x < 0.0f && direction_.y > 0.0f)
 	{
-		if (m_Direction.x < -m_WalkingSpeed && m_Direction.y > m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningSouthWest;
+		if (direction_.x < -walking_speed && direction_.y > walking_speed)
+			current_animation_ = animation_index::running_south_west;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingSouthWest;
+			current_animation_ = animation_index::walking_south_west;
 
 	}
-	else if (m_Direction.x < 0.0f && m_Direction.y == 0.0f)
+	else if (direction_.x < 0.0f && direction_.y == 0.0f)
 	{
-		if (m_Direction.x < -m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningWest;
+		if (direction_.x < -walking_speed)
+			current_animation_ = animation_index::running_west;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingWest;
+			current_animation_ = animation_index::walking_west;
 	}
-	else if (m_Direction.x < 0.0f && m_Direction.y < 0.0f)
+	else if (direction_.x < 0.0f && direction_.y < 0.0f)
 	{
-		if (m_Direction.x < -m_WalkingSpeed && m_Direction.y < -m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningNorthWest;
+		if (direction_.x < -walking_speed && direction_.y < -walking_speed)
+			current_animation_ = animation_index::running_north_west;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingNorthWest;
+			current_animation_ = animation_index::walking_north_west;
 	}
-	else if (m_Direction.x == 0.0f && m_Direction.y < 0.0f)
+	else if (direction_.x == 0.0f && direction_.y < 0.0f)
 	{
-		if (m_Direction.y < -m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningNorth;
+		if (direction_.y < -walking_speed)
+			current_animation_ = animation_index::running_north;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingNorth;
+			current_animation_ = animation_index::walking_north;
 	}
-	else if (m_Direction.x > 0.0f && m_Direction.y < 0.0f)
+	else if (direction_.x > 0.0f && direction_.y < 0.0f)
 	{
-		if (m_Direction.x > m_WalkingSpeed && m_Direction.y < -m_WalkingSpeed)
-			m_CurrentAnimation = AnimationIndex::RunningNorthEast;
+		if (direction_.x > walking_speed && direction_.y < -walking_speed)
+			current_animation_ = animation_index::running_north_east;
 		else
-			m_CurrentAnimation = AnimationIndex::WalkingNorthEast;
+			current_animation_ = animation_index::walking_north_east;
 	}
 	else
 	{
-		switch (m_CurrentAnimation)
+		switch (current_animation_)
 		{
-			case AnimationIndex::WalkingSouth:
-			case AnimationIndex::RunningSouth:
-				m_CurrentAnimation = AnimationIndex::IdleSouth;
+			case animation_index::walking_south:
+			case animation_index::running_south:
+				current_animation_ = animation_index::idle_south;
 				break;
-			case AnimationIndex::WalkingNorth:
-			case AnimationIndex::RunningNorth:
-				m_CurrentAnimation = AnimationIndex::IdleNorth;
+			case animation_index::walking_north:
+			case animation_index::running_north:
+				current_animation_ = animation_index::idle_north;
 				break;
-			case AnimationIndex::WalkingEast:
-			case AnimationIndex::RunningEast:
-				m_CurrentAnimation = AnimationIndex::IdleEast;
+			case animation_index::walking_east:
+			case animation_index::running_east:
+				current_animation_ = animation_index::idle_east;
 				break;
-			case AnimationIndex::WalkingWest:
-			case AnimationIndex::RunningWest:
-				m_CurrentAnimation = AnimationIndex::IdleWest;
+			case animation_index::walking_west:
+			case animation_index::running_west:
+				current_animation_ = animation_index::idle_west;
 				break;
-			case AnimationIndex::WalkingSouthEast:
-			case AnimationIndex::RunningSouthEast:
-				m_CurrentAnimation = AnimationIndex::IdleSouthEast;
+			case animation_index::walking_south_east:
+			case animation_index::running_south_east:
+				current_animation_ = animation_index::idle_south_east;
 				break;
-			case AnimationIndex::WalkingNorthEast:
-			case AnimationIndex::RunningNorthEast:
-				m_CurrentAnimation = AnimationIndex::IdleNorthEast;
+			case animation_index::walking_north_east:
+			case animation_index::running_north_east:
+				current_animation_ = animation_index::idle_north_east;
 				break;
-			case AnimationIndex::WalkingSouthWest:
-			case AnimationIndex::RunningSouthWest:
-				m_CurrentAnimation = AnimationIndex::IdleNorthWest;
+			case animation_index::walking_south_west:
+			case animation_index::running_south_west:
+				current_animation_ = animation_index::idle_north_west;
 				break;
-			case AnimationIndex::WalkingNorthWest:
-			case AnimationIndex::RunningNorthWest:
-				m_CurrentAnimation = AnimationIndex::IdleNorthWest;
+			case animation_index::walking_north_west:
+			case animation_index::running_north_west:
+				current_animation_ = animation_index::idle_north_west;
+				break;
+			default: 
 				break;
 		};
 	}

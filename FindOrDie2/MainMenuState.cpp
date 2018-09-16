@@ -1,175 +1,178 @@
-#include <sstream>
 #include <iostream>
+#include <utility>
 
-#include "MainMenuState.h"
+#include "MainMenuState.hpp"
 #include "DEFINITIONS.hpp"
-#include "GameState.h"
+#include "GameState.hpp"
 
 namespace ge
 {
-	MainMenuState::MainMenuState(GameDataRef data) :
-		m_Data(data)
+	main_menu_state::main_menu_state(std::shared_ptr<game_data> data) :
+		data_(std::move(data))
 	{
 	}
 
-
-	MainMenuState::~MainMenuState()
+	void main_menu_state::init()
 	{
-	}
-
-	void MainMenuState::Init()
-	{
-		m_Data->assets.LoadTexture("Background", MAIN_MENU_BACKGROUND);
-		m_Data->assets.LoadTexture("Game Title", MAIN_MENU_TITLE_BUTTON);
-		m_Data->assets.LoadTexture("Play Button", MAIN_MENU_PLAY_BUTTON);
-		m_Data->assets.LoadTexture("Settings Button", MAIN_MENU_SETTINGS_BUTTON);
-		m_Data->assets.LoadTexture("Exit Button", MAIN_MENU_EXIT_BUTTON);
-
-		m_Data->assets.LoadFont("Main Font", MAIN_FONT);
+		data_->assets->load_texture("Background", MAIN_MENU_BACKGROUND);
+		data_->assets->load_texture("Game Title", MAIN_MENU_TITLE_BUTTON);
+		data_->assets->load_texture("Play Button", MAIN_MENU_PLAY_BUTTON);
+		data_->assets->load_texture("Settings Button", MAIN_MENU_SETTINGS_BUTTON);
+		data_->assets->load_texture("Exit Button", MAIN_MENU_EXIT_BUTTON);
+					 
+		data_->assets->load_font("Main Font", MAIN_FONT);
 
 		// background
-		auto backgroundTexture = m_Data->assets.GetTexture("Background");
-		m_Background.setTexture(*backgroundTexture);
+		const auto background_texture = data_->assets->get_texture("Background");
+		background_.setTexture(*background_texture);
 
-		auto textureSize = backgroundTexture->getSize();
-		auto scaleFactor = sf::Vector2f((float)SCREEN_WIDTH / textureSize.x, (float)SCREEN_HEIGHT / textureSize.y);
-		auto currentScaleFactor = m_Background.getScale();
-		auto newScaleFactor = sf::Vector2f(currentScaleFactor.x * scaleFactor.x, currentScaleFactor.y * scaleFactor.y);
-		m_Background.scale(newScaleFactor);
+		const auto texture_size = background_texture->getSize();
+		const auto scale_factor = sf::Vector2f(static_cast<float>(SCREEN_WIDTH) / texture_size.x, static_cast<float>(SCREEN_HEIGHT) / texture_size.y);
+		const auto current_scale_factor = background_.getScale();
+		const auto new_scale_factor = sf::Vector2f(current_scale_factor.x * scale_factor.x, current_scale_factor.y * scale_factor.y);
+		background_.scale(new_scale_factor);
 
 		// title button
-		m_TitleButton.setTexture(*m_Data->assets.GetTexture("Game Title"));
-		m_TitleButton.scale(newScaleFactor * 2.5f);
-		auto titlePosition = sf::Vector2f(
-			(SCREEN_WIDTH / 2) - (m_TitleButton.getGlobalBounds().width / 2),
-			(SCREEN_HEIGHT / 3) - (m_TitleButton.getGlobalBounds().height / 2));
-		m_TitleButton.setPosition(titlePosition);
+		title_button_.setTexture(*data_->assets->get_texture("Game Title"));
+		title_button_.scale(new_scale_factor * 2.5f);
+		const auto title_position = sf::Vector2f(
+			(static_cast<float>(SCREEN_WIDTH) / 2) - (title_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(SCREEN_HEIGHT) / 3) - (title_button_.getGlobalBounds().height / 2));
+		title_button_.setPosition(title_position);
 
 		// play button
-		m_PlayButton.setTexture(*m_Data->assets.GetTexture("Play Button"));
+		play_button_.setTexture(*data_->assets->get_texture("Play Button"));
 
-		m_PlayButton.scale(newScaleFactor * 1.5f);
-		auto playButtonPosition = sf::Vector2f((SCREEN_WIDTH / 2) - (m_PlayButton.getGlobalBounds().width / 2),
-			(SCREEN_HEIGHT / 2) - (m_PlayButton.getGlobalBounds().height / 2));
-		m_PlayButton.setPosition(playButtonPosition);
+		play_button_.scale(new_scale_factor * 1.5f);
+		const auto play_button_position = sf::Vector2f((static_cast<float>(SCREEN_WIDTH) / 2) - (play_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(SCREEN_HEIGHT) / 2) - (play_button_.getGlobalBounds().height / 2));
+		play_button_.setPosition(play_button_position);
 
 		// settings button
-		m_SettingsButton.setTexture(*m_Data->assets.GetTexture("Settings Button"));
+		settings_button_.setTexture(*data_->assets->get_texture("Settings Button"));
 
-		m_SettingsButton.scale(newScaleFactor * 1.5f);
-		auto settingsButtonPosition = sf::Vector2f(
-			playButtonPosition.x,
-			playButtonPosition.y + 1.5f * m_PlayButton.getGlobalBounds().height);
-		m_SettingsButton.setPosition(settingsButtonPosition);
+		settings_button_.scale(new_scale_factor * 1.5f);
+		const auto settings_button_position = sf::Vector2f(
+			play_button_position.x,
+			play_button_position.y + 1.5f * play_button_.getGlobalBounds().height);
+		settings_button_.setPosition(settings_button_position);
 
 		// exit button
-		m_ExitButton.setTexture(*m_Data->assets.GetTexture("Exit Button"));
+		exit_button_.setTexture(*data_->assets->get_texture("Exit Button"));
 
-		m_ExitButton.scale(newScaleFactor * 1.5f);
-		auto exitButtonPosition = sf::Vector2f(
-			settingsButtonPosition.x,
-			settingsButtonPosition.y + 1.5f * m_SettingsButton.getGlobalBounds().height);
-		m_ExitButton.setPosition(exitButtonPosition);
+		exit_button_.scale(new_scale_factor * 1.5f);
+		const auto exit_button_position = sf::Vector2f(
+			settings_button_position.x,
+			settings_button_position.y + 1.5f * settings_button_.getGlobalBounds().height);
+		exit_button_.setPosition(exit_button_position);
 
 		// set fonts and texts
-		auto mainFont = m_Data->assets.GetFont("Main Font");
+		const auto main_font = data_->assets->get_font("Main Font");
 
 		// title button text
-		m_TitleButtonText.setFont(*mainFont);
-		m_TitleButtonText.setString(GAME_TITLE);
-		m_TitleButtonText.scale(newScaleFactor * 1.8f);
-		m_TitleButtonText.setFillColor(m_Gray);
-	
-		auto titleTextPosition = sf::Vector2f(
-			m_TitleButton.getPosition().x + m_TitleButton.getGlobalBounds().width / 2 - m_TitleButtonText.getGlobalBounds().width / 2,
-			m_TitleButton.getPosition().y + m_TitleButton.getGlobalBounds().height / 2 - m_TitleButtonText.getGlobalBounds().height);
-		m_TitleButtonText.setPosition(titleTextPosition);
+		title_button_text_.setFont(*main_font);
+		title_button_text_.setString(GAME_TITLE);
+		title_button_text_.scale(new_scale_factor * 1.8f);
+		title_button_text_.setFillColor(gray_);
+
+		const auto title_text_position = sf::Vector2f(
+			title_button_.getPosition().x + title_button_.getGlobalBounds().width / 2 - title_button_text_.getGlobalBounds().width / 2,
+			title_button_.getPosition().y + title_button_.getGlobalBounds().height / 2 - title_button_text_.getGlobalBounds().height);
+		title_button_text_.setPosition(title_text_position);
 
 		// play button text
-		m_PlayButtonText.setFont(*mainFont);
-		m_PlayButtonText.setString(MAIN_MENU_PLAY_BUTTON_TEXT);
-		m_PlayButtonText.scale(newScaleFactor * 1.5f);
-		m_PlayButtonText.setFillColor(sf::Color::White);
+		play_button_text_.setFont(*main_font);
+		play_button_text_.setString(MAIN_MENU_PLAY_BUTTON_TEXT);
+		play_button_text_.scale(new_scale_factor * 1.5f);
+		play_button_text_.setFillColor(sf::Color::White);
 
-		auto playButtonTextPosition = sf::Vector2f(
-			m_PlayButton.getPosition().x + m_PlayButton.getGlobalBounds().width / 2 - m_PlayButtonText.getGlobalBounds().width / 2,
-			m_PlayButton.getPosition().y + m_PlayButton.getGlobalBounds().height / 2 - m_PlayButtonText.getGlobalBounds().height);
-		m_PlayButtonText.setPosition(playButtonTextPosition);
+		const auto play_button_text_position = sf::Vector2f(
+			play_button_.getPosition().x + play_button_.getGlobalBounds().width / 2 - play_button_text_.getGlobalBounds().width / 2,
+			play_button_.getPosition().y + play_button_.getGlobalBounds().height / 2 - play_button_text_.getGlobalBounds().height);
+		play_button_text_.setPosition(play_button_text_position);
 
 		// settings button text
-		m_SettingsButtonText.setFont(*mainFont);
-		m_SettingsButtonText.setString(MAIN_MENU_SETTINGS_BUTTON_TEXT);
-		m_SettingsButtonText.scale(newScaleFactor * 1.5f);
-		m_SettingsButtonText.setFillColor(sf::Color::White);
+		settings_button_text_.setFont(*main_font);
+		settings_button_text_.setString(MAIN_MENU_SETTINGS_BUTTON_TEXT);
+		settings_button_text_.scale(new_scale_factor * 1.5f);
+		settings_button_text_.setFillColor(sf::Color::White);
 
-		auto settingsButtonTextPosition = sf::Vector2f(
-			m_SettingsButton.getPosition().x + m_SettingsButton.getGlobalBounds().width / 2 - m_SettingsButtonText.getGlobalBounds().width / 2,
-			m_SettingsButton.getPosition().y + m_SettingsButton.getGlobalBounds().height / 2 - m_SettingsButtonText.getGlobalBounds().height);
-		m_SettingsButtonText.setPosition(settingsButtonTextPosition);
+		const auto settings_button_text_position = sf::Vector2f(
+			settings_button_.getPosition().x + settings_button_.getGlobalBounds().width / 2 - settings_button_text_.getGlobalBounds().width / 2,
+			settings_button_.getPosition().y + settings_button_.getGlobalBounds().height / 2 - settings_button_text_.getGlobalBounds().height);
+		settings_button_text_.setPosition(settings_button_text_position);
 	
 		// exit button text
-		m_ExitButtonText.setFont(*mainFont);
-		m_ExitButtonText.setString(MAIN_MENU_EXIT_BUTTON_TEXT);
-		m_ExitButtonText.scale(newScaleFactor * 1.5f);
-		m_ExitButtonText.setFillColor(sf::Color::White);
+		exit_button_text_.setFont(*main_font);
+		exit_button_text_.setString(MAIN_MENU_EXIT_BUTTON_TEXT);
+		exit_button_text_.scale(new_scale_factor * 1.5f);
+		exit_button_text_.setFillColor(sf::Color::White);
 
-		auto exitButtonTextPosition = sf::Vector2f(
-			m_ExitButton.getPosition().x + m_ExitButton.getGlobalBounds().width / 2 - m_ExitButtonText.getGlobalBounds().width / 2,
-			m_ExitButton.getPosition().y + m_ExitButton.getGlobalBounds().height / 2 - m_ExitButtonText.getGlobalBounds().height);
-		m_ExitButtonText.setPosition(exitButtonTextPosition);
+		const auto exit_button_text_position = sf::Vector2f(
+			exit_button_.getPosition().x + exit_button_.getGlobalBounds().width / 2 - exit_button_text_.getGlobalBounds().width / 2,
+			exit_button_.getPosition().y + exit_button_.getGlobalBounds().height / 2 - exit_button_text_.getGlobalBounds().height);
+		exit_button_text_.setPosition(exit_button_text_position);
 	}
 
-	void MainMenuState::HandleInput()
+	void main_menu_state::handle_input()
 	{
-		sf::Event event;
-		while (m_Data->window.pollEvent(event))
+		sf::Event event{};
+		while (data_->window->pollEvent(event))
 		{
 			if (sf::Event::Closed == event.type)
 			{
-				m_Data->window.close();
+				data_->window->close();
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_PlayButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(play_button_, sf::Mouse::Left, data_->window))
 			{
 				std::cout << "Switch to the Game Screen" << std::endl;
-				m_Data->machine.AddState(StateRef(new GameState(m_Data)), true);
+				data_->machine->add_state(std::make_shared<game_state>(game_state(data_)), true);
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_SettingsButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(settings_button_, sf::Mouse::Left, data_->window))
 			{
 				std::cout << "Switch to the Settings Screen" << std::endl;
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_ExitButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(exit_button_, sf::Mouse::Left, data_->window))
 			{
-				m_Data->window.close();
+				data_->window->close();
 			}
 		}
 	}
 
-	void MainMenuState::Update(float deltaTime)
+	void main_menu_state::update(const float delta_time)
 	{
 		// empty
 	}
 
-	void MainMenuState::Draw(float deltaTime)
+	void main_menu_state::draw()
 	{
-		m_Data->window.clear();
+		data_->window->clear();
+					 
+		data_->window->draw(background_);
+					 
+		data_->window->draw(title_button_);
+		data_->window->draw(title_button_text_);
+					 
+		data_->window->draw(play_button_);
+		data_->window->draw(play_button_text_);
+					 
+		data_->window->draw(settings_button_);
+		data_->window->draw(settings_button_text_);
+					 
+		data_->window->draw(exit_button_);
+		data_->window->draw(exit_button_text_);
+					 
+		data_->window->display();
+	}
 
-		m_Data->window.draw(m_Background);
+	void main_menu_state::resume()
+	{
+	}
 
-		m_Data->window.draw(m_TitleButton);
-		m_Data->window.draw(m_TitleButtonText);
-
-		m_Data->window.draw(m_PlayButton);
-		m_Data->window.draw(m_PlayButtonText);
-
-		m_Data->window.draw(m_SettingsButton);
-		m_Data->window.draw(m_SettingsButtonText);
-
-		m_Data->window.draw(m_ExitButton);
-		m_Data->window.draw(m_ExitButtonText);
-
-		m_Data->window.display();
+	void main_menu_state::pause()
+	{
 	}
 }

@@ -1,91 +1,83 @@
-#include "GameState.h"
+#include "GameState.hpp"
 #include "DEFINITIONS.hpp"
-#include "PauseState.h"
+#include "PauseState.hpp"
+
+#include <iostream>
+#include "Player.hpp"
 
 namespace ge
 {
-	GameState::GameState(GameDataRef data) :
-		m_Data(data)
+	game_state::game_state(std::shared_ptr<game_data> data) :
+		data_(std::move(data)), 
+		game_progress_(game_progress::playing)
 	{
 	}
 
-
-	GameState::~GameState()
+	void game_state::init()
 	{
-		delete m_pPlayer;
-		m_pPlayer = nullptr;
+		p_map_ = std::make_shared<Map>(Map(data_->assets));
 
-		delete m_pDefaultView;
-		m_pDefaultView = nullptr;
+		data_->input->add_action(up, sf::Keyboard::Key::Up);
+		data_->input->add_action(down, sf::Keyboard::Key::Down);
+		data_->input->add_action(left, sf::Keyboard::Key::Left);
+		data_->input->add_action(right, sf::Keyboard::Key::Right);
+		data_->input->add_action(c, sf::Keyboard::Key::C);
+		data_->input->add_action(esc, sf::Keyboard::Key::Escape);
 
-		delete m_pMap;
-		m_pMap = nullptr;
+		p_default_view_ = std::make_shared<sf::View>(sf::View());
+		p_default_view_->setSize({ static_cast<float>(SCREEN_HEIGHT), static_cast<float>(SCREEN_WIDTH) });
+		p_default_view_->zoom(1.0f);
+		p_default_view_->setCenter({ 0,0 });
+
+		p_current_view_ = p_default_view_;
+
+		p_player_ = std::make_shared<player>(player(data_->assets, data_->input));
+		p_current_view_ = p_player_->get_view();
+
+		p_map_->set_view(p_current_view_);
+
+		std::thread generate_map_thread(&Map::generate_map, p_map_);
+		generate_map_thread.detach();
 	}
 
-	void GameState::Init()
+	void game_state::handle_input()
 	{
-		m_pMap = new Map(&m_Data->assets);
-
-		m_Data->input.AddAction(ge::InputKeys::Up, sf::Keyboard::Key::Up);
-		m_Data->input.AddAction(ge::InputKeys::Down, sf::Keyboard::Key::Down);
-		m_Data->input.AddAction(ge::InputKeys::Left, sf::Keyboard::Key::Left);
-		m_Data->input.AddAction(ge::InputKeys::Right, sf::Keyboard::Key::Right);
-		m_Data->input.AddAction(ge::InputKeys::C, sf::Keyboard::Key::C);
-		m_Data->input.AddAction(ge::InputKeys::Esc, sf::Keyboard::Key::Escape);
-
-		m_pDefaultView = new sf::View();
-		m_pDefaultView->setSize({ (float)SCREEN_HEIGHT, (float)SCREEN_WIDTH });
-		m_pDefaultView->zoom(1.0f);
-		m_pDefaultView->setCenter({ 0,0 });
-
-		m_pCurrentView = m_pDefaultView;
-
-		m_pPlayer = new Player(&m_Data->assets, &m_Data->input);
-		m_pCurrentView = m_pPlayer->GetView();
-
-		m_pMap->SetView(m_pCurrentView);
-
-		std::thread generateMapThread(&Map::GenerateMap, m_pMap);
-		generateMapThread.detach();
-
-		m_GameState = STATE_PLAYING;
-	}
-
-	void GameState::HandleInput()
-	{
-		sf::Event event;
-		while (m_Data->window.pollEvent(event))
+		sf::Event event{};
+		while (data_->window->pollEvent(event))
 		{
 			if (event.type == sf::Event::Closed)
 			{
-				m_Data->window.close();
+				data_->window->close();
 			}
 
-			switch (m_GameState)
+			switch (game_progress_)
 			{
-			case STATE_PLAYING:
-				m_pPlayer->ProcessEvents(&event);
+			case game_progress::playing:
+					p_player_->process_events(std::make_shared<sf::Event>(event));
 
-				if (m_Data->input.IsKeyReleased(ge::InputKeys::Esc, &event))
-					m_Data->machine.AddState(StateRef(new PauseState(m_Data)), false);
-				break;
-			case STATE_PAUSE:
-				// ..
-				break;
-			default:
-				break;
+					if (data_->input->is_key_released(esc, std::make_shared<sf::Event>(event)))
+					{
+						std::wcout << "Switch from in-game to pause screen!" << std::endl;
+						data_->machine->add_state(std::make_shared<pause_state>(pause_state(data_)), false);
+					}
+					break;
+			case game_progress::pause:
+					// ..
+					break;
+				default:
+					break;
 			}
 		}
 	}
 
-	void GameState::Update(float deltaTime)
+	void game_state::update(const float delta_time)
 	{
-		switch (m_GameState)
+		switch (game_progress_)
 		{
-		case STATE_PLAYING:
-			m_pPlayer->Update(deltaTime);
+		case game_progress::playing:
+			p_player_->update(delta_time);
 			break;
-		case STATE_PAUSE:
+		case game_progress::pause:
 			// ...
 			break;
 		default:
@@ -93,24 +85,32 @@ namespace ge
 		}
 	}
 
-	void GameState::Draw(float deltaTime)
+	void game_state::draw()
 	{
-		m_Data->window.clear();
-		m_Data->window.setView(*m_pCurrentView);
+		data_->window->clear();
+		data_->window->setView(*p_current_view_);
 
-		switch (m_GameState)
+		switch (game_progress_)
 		{
-		case STATE_PLAYING:
-			m_pMap->Draw(&m_Data->window);
-			m_pPlayer->Draw(&m_Data->window);
+		case game_progress::playing:
+			p_map_->draw(data_->window);
+			p_player_->draw(data_->window);
 			break;
-		case STATE_PAUSE:
+		case game_progress::pause:
 			// ...
 			break;
 		default:
 			break;
 		}
 
-		m_Data->window.display();
+		data_->window->display();
+	}
+
+	void game_state::pause()
+	{
+	}
+
+	void game_state::resume()
+	{
 	}
 }

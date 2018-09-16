@@ -1,62 +1,52 @@
 #include "Game.hpp"
-#include "AssetManager.hpp"
-#include "InputManager.hpp"
 #include "SplashState.hpp"
 
 namespace ge
 {
-	Game::Game(float windowWidth, float windowHeight, std::string gameTitle) noexcept
+	game::game(const float window_width, const float window_height, const std::string game_title) noexcept
 	{
-		m_Data->window.create(
+		data_->window = new sf::RenderWindow(
 			sf::VideoMode(
-				(unsigned int)windowWidth, 
-				(unsigned int)windowHeight),
-			gameTitle,
+				static_cast<unsigned int>(window_width), 
+				static_cast<unsigned int>(window_height)),
+			game_title,
 			sf::Style::Close | sf::Style::Titlebar);
-		m_Data->machine.AddState(StateRef(new SplashState(m_Data)));
+		data_->machine->add_state(std::make_shared<splash_state>(splash_state(data_)));
 
-		m_Data->window.setFramerateLimit(m_MaxFPS);
+		data_->window->setFramerateLimit(max_fps_);
 
-		Run();
+		run();
 	}
 
-	Game::~Game()
+	void game::run() const
 	{
-	}
+		auto current_time = clock_.getElapsedTime().asSeconds();
+		auto accumulator = 0.0f;
 
-	void Game::Run()
-	{
-		float newTime, frameTime, interpolation;
-
-		float currentTime = m_Clock.getElapsedTime().asSeconds();
-		float accumulator = 0.0f;
-
-		while (m_Data->window.isOpen())
+		while (data_->window->isOpen())
 		{
-			m_Data->machine.ProcessStateChanges();
+			data_->machine->process_state_changes();
 
 			// calculate time between events
-			newTime = m_Clock.getElapsedTime().asSeconds();
-			frameTime = newTime - currentTime;
+			const auto new_time = clock_.getElapsedTime().asSeconds();
+			auto frame_time = new_time - current_time;
 
-			if (frameTime > 0.25f)
+			if (frame_time > 0.25f)
 			{
-				frameTime = 0.25f;
+				frame_time = 0.25f;
 			}
 
-			currentTime = newTime;
-			accumulator += frameTime;
+			current_time = new_time;
+			accumulator += frame_time;
 
-			while (accumulator >= m_DeltaTime)
+			while (accumulator >= delta_time_)
 			{
-				m_Data->machine.GetActiveState()->HandleInput();
-				m_Data->machine.GetActiveState()->Update(m_DeltaTime);
+				data_->machine->get_active_state()->handle_input();
+				data_->machine->get_active_state()->update(delta_time_);
 
-				accumulator -= m_DeltaTime;
+				accumulator -= delta_time_;
 			}
-
-			interpolation = accumulator / m_DeltaTime;
-			m_Data->machine.GetActiveState()->Draw(interpolation);
+			data_->machine->get_active_state()->draw();
 		}
 	}
 }

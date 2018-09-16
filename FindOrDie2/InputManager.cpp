@@ -2,48 +2,42 @@
 
 namespace ge
 {
-	InputManager::InputManager() noexcept
+	input_manager::input_manager() noexcept
 	{
 	}
 
-	InputManager::~InputManager()
+	void input_manager::add_action(const int id, const sf::Keyboard::Key key)
 	{
+		actions_[id] = key;
 	}
 
-	void InputManager::Update()
+	bool input_manager::is_key_pressed(const int id)
 	{
+		return sf::Keyboard::isKeyPressed(actions_[id]);
 	}
 
-	void InputManager::AddAction(int id, sf::Keyboard::Key key)
-	{
-		m_Actions[id] = key;
-	}
-
-	bool InputManager::IsKeyPressed(int id)
-	{
-		return sf::Keyboard::isKeyPressed(m_Actions[id]);
-	}
-
-	bool InputManager::IsKeyReleased(int id, sf::Event* event)
+	bool input_manager::is_key_released(const int id, const std::shared_ptr<sf::Event>& event)
 	{
 		if (event->type == sf::Event::KeyReleased)
-			return event->key.code == m_Actions[id];
+		{
+			return event->key.code == actions_[id];
+		}
 
 		return false;
 	}
-	bool InputManager::IsSpriteClicked(sf::Sprite * pObject, sf::Mouse::Button button, sf::RenderWindow * pWindow)
+	bool input_manager::is_sprite_clicked(sf::Sprite& object, const sf::Mouse::Button button, sf::RenderWindow* p_window) const
 	{
 		if (sf::Mouse::isButtonPressed(button))
 		{
-			auto objectPosition = pObject->getPosition();
-			auto objectGlobalBounds = pObject->getGlobalBounds();
-			sf::IntRect buttonRect(
-				(int)objectPosition.x, 
-				(int)objectPosition.y, 
-				(int)objectGlobalBounds.width, 
-				(int)objectGlobalBounds.height);
+			const auto object_position = object.getPosition();
+			const auto object_global_bounds = object.getGlobalBounds();
+			sf::IntRect button_rect(
+				static_cast<int>(object_position.x), 
+				static_cast<int>(object_position.y), 
+				static_cast<int>(object_global_bounds.width), 
+				static_cast<int>(object_global_bounds.height));
 			
-			if (buttonRect.contains(sf::Mouse::getPosition(*pWindow)))
+			if (button_rect.contains(sf::Mouse::getPosition(*p_window)))
 			{
 				return true;
 			}
@@ -51,8 +45,8 @@ namespace ge
 
 		return false;
 	}
-	sf::Vector2i InputManager::GetMousePosition(sf::RenderWindow * pWindow)
+	sf::Vector2i input_manager::get_mouse_position(const std::unique_ptr<sf::RenderWindow> p_window) const
 	{
-		return sf::Mouse::getPosition(*pWindow);
+		return sf::Mouse::getPosition(*p_window);
 	}
 }

@@ -1,14 +1,22 @@
 #pragma once
 #include "Tile.hpp"
 
-class TileBlock
+class tile_block
 {
 public:
-	TileBlock() noexcept;
-	~TileBlock();
-	std::vector<Tile*>* GetTiles();
+	tile_block() noexcept = default;
 
+	tile_block(const tile_block& other) = default;
+	tile_block(tile_block&& other) noexcept = default;
+	tile_block& operator=(const tile_block& other) = default;
+	tile_block& operator=(tile_block&& other) noexcept = default;
+
+	~tile_block() = default;
+
+	std::shared_ptr<std::vector<std::shared_ptr<tile>>> get_tiles() const;
+	
 private:
-	std::vector<Tile*> m_Tiles;
+	std::shared_ptr<std::vector<std::shared_ptr<tile>>> m_tiles_ = 
+		std::make_shared<std::vector<std::shared_ptr<tile>>>(std::vector<std::shared_ptr<tile>>());
 };
 

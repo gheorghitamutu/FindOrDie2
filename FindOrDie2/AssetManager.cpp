@@ -2,67 +2,45 @@
 
 namespace ge
 {
-	AssetManager::AssetManager()
+	asset_manager::asset_manager()
 	{
-		LoadTexture("Ghost",		"Resources/Sprites/ghost.png");
-		LoadTexture("Player_Man",	"Resources/Sprites/Player_Man/man.png");
-		LoadTexture("Full_Block",	"Resources/Sprites/Tiles/Terrain/full_block.png");
+		load_texture("Ghost",		"Resources/Sprites/ghost.png");
+		load_texture("Player_Man",	"Resources/Sprites/Player_Man/man.png");
+		load_texture("Full_Block",	"Resources/Sprites/Tiles/Terrain/full_block.png");
 	}
 
-	AssetManager::~AssetManager()
+	void asset_manager::load_texture(const std::string& name, const std::string& file_name)
 	{
-		for (auto item : m_Textures)
-		{
-			delete item.second;
-			item.second = nullptr;
-		}
+		auto texture = std::make_shared<sf::Texture>(sf::Texture());
 
-		for (auto item : m_Fonts)
+		const auto texture_loaded = texture->loadFromFile(file_name);
+
+		if (texture_loaded)
 		{
-			delete item.second;
-			item.second = nullptr;
+			textures_[name] = texture;
 		}
 	}
 
-	void AssetManager::LoadTexture(std::string name, std::string fileName)
+	std::shared_ptr<sf::Texture> asset_manager::get_texture(const std::string& name)
 	{
-		auto texture = new sf::Texture;
-
-		bool textureLoaded = texture->loadFromFile(fileName);
-		if (textureLoaded)
-		{
-			m_Textures[name] = texture;
-		}
-		else
-		{
-			delete texture;
-		}
-	}
-
-	sf::Texture* AssetManager::GetTexture(std::string name)
-	{
-		auto texture = m_Textures[name];
+		const auto texture = textures_[name];
 
 		return texture != nullptr ? texture : nullptr;
 	}
 
-	void AssetManager::LoadFont(std::string name, std::string fileName)
+	void asset_manager::load_font(const std::string& name, const std::string& file_name)
 	{
-		auto font = new sf::Font;
+		auto font = std::make_shared<sf::Font>(sf::Font());
 
-		if (font->loadFromFile(fileName))
+		if (font->loadFromFile(file_name))
 		{
-			m_Fonts[name] = font;
-		}
-		else
-		{
-			delete font;
+			fonts_[name] = font;
 		}
 	}
 
-	sf::Font* AssetManager::GetFont(std::string name)
+	std::shared_ptr<sf::Font> asset_manager::get_font(const std::string& name)
 	{
-		auto font = m_Fonts[name];
+		const auto font = fonts_[name];
 
 		return font != nullptr ? font : nullptr;
 	}

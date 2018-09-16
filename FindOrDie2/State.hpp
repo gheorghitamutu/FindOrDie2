@@ -2,16 +2,24 @@
 
 namespace ge
 {
-	class State
+	class state
 	{
 	public:
-		virtual void Init() = 0;
+		state() = default;
 
-		virtual void HandleInput() = 0;
-		virtual void Update(float deltaTime) = 0;
-		virtual void Draw(float deltaTime) = 0;
+		state(const state& other) = default;
+		state(state&& other) noexcept = default;
+		state& operator=(const state& other) = default;
+		state& operator=(state&& other) noexcept = default;
+		
+		virtual ~state() = default;
 
-		virtual void Pause() {}
-		virtual void Resume() {}
+		virtual void handle_input() = 0;
+		virtual void update(float delta_time) = 0;
+		virtual void draw() = 0;
+
+		virtual void init() = 0;
+		virtual void pause() = 0;
+		virtual void resume() = 0;
 	};
 }

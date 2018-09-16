@@ -1,40 +1,50 @@
 #include "Animation.hpp"
 
-Animation::Animation(int x, int y, int width, int height, sf::Texture *texture, int numberOfFrames, float holdTime) :
-	m_NumberOfFrames(numberOfFrames),
-	m_HoldTime(holdTime)
+animation::animation() :
+	number_of_frames_(0),
+	frame_index_(0),
+	hold_time_(0.0f),
+	time_(0.0f),
+	p_texture_(nullptr)
 {
-	m_pTexture = texture;
-	for (int i = 0; i < m_NumberOfFrames; i++)
+}
+
+animation::animation(const int x, const int y, 
+	const int width, const int height, 
+	std::shared_ptr<sf::Texture> texture, 
+	const int number_of_frames, const float hold_time) :
+		number_of_frames_(number_of_frames),
+		frame_index_(0),
+		hold_time_(hold_time),
+		time_(0),
+		p_texture_(std::move(texture))
+{
+	for (auto i = 0; i < number_of_frames_; i++)
 	{
-		m_Frames.emplace_back(sf::IntRect { x + i * width, y, width, height });
+		frames_.emplace_back(sf::IntRect{ x + i * width, y, width, height });
 	}
 }
 
-void Animation::ApplyToSprite(sf::Sprite* body)
+void animation::apply_to_sprite(sf::Sprite* body)
 {
-	body->setTexture(*m_pTexture);
-	body->setTextureRect(m_Frames[m_FrameIndex]);
+	body->setTexture(*p_texture_);
+	body->setTextureRect(frames_[frame_index_]);
 }
 
-void Animation::Update(float deltaTime)
+void animation::update(const float delta_time)
 {
-	m_Time += deltaTime;
-	while (m_Time >= m_HoldTime)
+	time_ += delta_time;
+	while (time_ >= hold_time_)
 	{
-		m_Time -= m_HoldTime;
-		Advance();
+		time_ -= hold_time_;
+		advance();
 	}
 }
 
-Animation::~Animation()
+void animation::advance()
 {
-}
-
-void Animation::Advance()
-{
-	if (++m_FrameIndex >= m_NumberOfFrames)
+	if (++frame_index_ >= number_of_frames_)
 	{
-		m_FrameIndex = 0;
+		frame_index_ = 0;
 	}
 }

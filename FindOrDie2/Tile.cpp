@@ -1,53 +1,55 @@
 #include "Tile.hpp"
 
-Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage usage, TileState state, ge::AssetManager* assets)
+tile::tile(const std::string& name, const tile_type type, const tile_appearance appearance,
+           const tile_usage usage, const tile_state state, const std::shared_ptr<ge::asset_manager>& assets) :
+	type_(type),
+	appearance_(appearance),
+	usage_(usage),
+	state_(state)
 {
-	m_Body = new sf::Sprite();
-	auto bodyTexture = assets->GetTexture(name);
-	if (bodyTexture != nullptr)
+	body_ = std::make_shared<sf::Sprite>(sf::Sprite());
+
+	const auto body_texture = assets->get_texture(name);
+	
+	if (body_texture != nullptr)
 	{
-		m_Body->setTexture(*bodyTexture);
+		body_->setTexture(*body_texture);
 	}
 	else
 	{
-		m_Body->setColor(sf::Color::Magenta);
+		body_->setColor(sf::Color::Magenta);
 	}
 
-	m_Type = type;
-	m_Appearance = appearance;
-	m_Usage = usage;
-	m_State = state;
-
-	switch (m_Type)
+	switch (type_)
 	{
-	case TileType::RockSolid:
-		switch (m_Usage)
+	case rock_solid:
+		switch (usage_)
 		{
-		case TileUsage::Floor:
+		case land:
 			break;
-		case TileUsage::Wall:
+		case wall:
 			break;
 		default:
 			break;
 		}
 		break;
-	case TileType::Liquid:
-		switch (m_Usage)
+	case liquid:
+		switch (usage_)
 		{
-		case TileUsage::Floor:
+		case land:
 			break;
-		case TileUsage::Wall:
+		case wall:
 			break;
 		default:
 			break;
 		}
 		break;
-	case TileType::Gas:
-		switch (m_Usage)
+	case gas:
+		switch (usage_)
 		{
-		case TileUsage::Floor:
+		case land:
 			break;
-		case TileUsage::Wall:
+		case wall:
 			break;
 		default:
 			break;
@@ -58,19 +60,16 @@ Tile::Tile(std::string name, TileType type, TileAppearance appearance, TileUsage
 	}
 }
 
-
-Tile::~Tile()
+tile::tile(tile* other)
 {
-	delete m_Body;
-	m_Body = nullptr;
 }
 
-sf::Sprite * Tile::GetBody()
+std::shared_ptr<sf::Sprite> tile::get_body() const
 {
-	return m_Body;
+	return body_;
 }
 
-bool Tile::IsVisible()
+bool tile::is_visible() const
 {
-	return m_State == TileAppearance::Visible;
+	return appearance_ == visible;
 }

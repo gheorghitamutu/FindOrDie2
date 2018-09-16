@@ -1,68 +1,72 @@
-#include <sstream>
+#include <memory>
 #include <iostream>
+#include <utility>
 
 #include "SplashState.hpp"
 #include "DEFINITIONS.hpp"
-#include "MainMenuState.h"
+#include "MainMenuState.hpp"
 
 namespace ge
 {
-	SplashState::SplashState(GameDataRef data) :
-		m_Data(data)
+	splash_state::splash_state(const std::shared_ptr<game_data>& data) :
+		data_(std::move(data))
 	{
 	}
 
-
-	SplashState::~SplashState()
+	void splash_state::init()
 	{
-	}
-
-	void SplashState::Init()
-	{
-		m_Data->assets.LoadTexture(
+		data_->assets->load_texture(
 			"Splash State Background", 
 			SPLASH_BACKGROUND);
 
-		auto texture = m_Data->assets.GetTexture("Splash State Background");
-		m_Background.setTexture(*texture);
+		const auto texture = data_->assets->get_texture("Splash State Background");
+		background_.setTexture(*texture);
 
 		// resize the background to fit any resolution
-		auto textureSize = texture->getSize();
-		auto scaleFactor = sf::Vector2f((float)SCREEN_WIDTH / textureSize.x, (float)SCREEN_HEIGHT / textureSize.y);
-		auto currentScaleFactor = m_Background.getScale();
-		auto newScaleFactor = sf::Vector2f(currentScaleFactor.x * scaleFactor.x, currentScaleFactor.y * scaleFactor.y);
-		m_Background.scale(newScaleFactor);
+		const auto texture_size = texture->getSize();
+		const auto scale_factor = sf::Vector2f(static_cast<float>(SCREEN_WIDTH) / texture_size.x, static_cast<float>(SCREEN_HEIGHT) / texture_size.y);
+		const auto current_scale_factor = background_.getScale();
+		const auto new_scale_factor = sf::Vector2f(current_scale_factor.x * scale_factor.x, current_scale_factor.y * scale_factor.y);
+		background_.scale(new_scale_factor);
 	}
 
-	void SplashState::HandleInput()
+	void splash_state::handle_input()
 	{
-		sf::Event event;
+		sf::Event event{};
 
-		while (m_Data->window.pollEvent(event))
+		while (data_->window->pollEvent(event))
 		{
 			if (sf::Event::Closed == event.type)
 			{
-				m_Data->window.close();
+				data_->window->close();
 			}
 		}
 	}
 
-	void SplashState::Update(float deltaTime)
+	void splash_state::update(const float delta_time)
 	{
-		if (m_Clock.getElapsedTime().asSeconds() > SPLASH_TIMEOUT)
+		if (clock_.getElapsedTime().asSeconds() > SPLASH_TIMEOUT)
 		{
 			// Switch to the Main Menu
 			std::cout << "Switch to the Main Menu" << std::endl;
-			m_Data->machine.AddState(StateRef(new MainMenuState(m_Data)), true);
+			data_->machine->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
 		}
 	}
 
-	void SplashState::Draw(float deltaTime)
+	void splash_state::draw()
 	{
-		m_Data->window.clear(sf::Color::Black);
+		data_->window->clear(sf::Color::Black);
 
-		m_Data->window.draw(m_Background);
+		data_->window->draw(background_);
 
-		m_Data->window.display();
+		data_->window->display();
+	}
+
+	void splash_state::pause()
+	{
+	}
+
+	void splash_state::resume()
+	{
 	}
 }

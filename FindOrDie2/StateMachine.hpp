@@ -7,28 +7,33 @@
 
 namespace ge
 {
-	typedef std::unique_ptr<State> StateRef;
-
-	class StateMachine
+	class state_machine
 	{
 	public:
-		StateMachine() {}
-		~StateMachine() {}
+		state_machine() = default;
 
-		void AddState(StateRef newState, bool isReplacing = true);
-		void RemoveState();
+		state_machine(const state_machine& other) = default;
+		state_machine(state_machine&& other) noexcept = default;
+		explicit state_machine(state_machine* other);
+		state_machine& operator=(const state_machine& other) = default;
+		state_machine& operator=(state_machine&& other) noexcept = default;
 
-		void ProcessStateChanges();
+		~state_machine() = default;
 
-		StateRef &GetActiveState();
+		void add_state(const std::shared_ptr<state>& new_state, bool is_replacing = true);
+		void remove_state();
+
+		void process_state_changes();
+
+		std::shared_ptr<state> &get_active_state();
 
 	private:
-		std::stack<StateRef> m_States;
-		StateRef m_NewState;
+		std::stack<std::shared_ptr<state>> m_states_;
+		std::shared_ptr<state> new_state_;
 
-		bool m_IsRemoving;
-		bool m_IsAdding;
-		bool m_IsReplacing;
+		bool is_removing_ = false;
+		bool is_adding_ = false;
+		bool is_replacing_ = false;
 	};
 }
 

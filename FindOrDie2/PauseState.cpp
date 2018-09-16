@@ -1,145 +1,152 @@
-#include "PauseState.h"
-#include "MainMenuState.h"
+#include "PauseState.hpp"
+#include <utility>
+#include "MainMenuState.hpp"
 #include "DEFINITIONS.hpp"
+
+#include <iostream>
 
 namespace ge
 {
-	PauseState::PauseState(GameDataRef data) :
-		m_Data(data)
+	pause_state::pause_state(std::shared_ptr<game_data> data) :
+		data_(std::move(data))
 	{
 	}
 
-	PauseState::~PauseState()
+	void pause_state::init()
 	{
-	}
+		data_->window->setView(data_->window->getDefaultView());
+		data_->assets->load_texture("Resume Button", MAIN_MENU_RESUME_BUTTON);
+		data_->assets->load_texture("Save Button", MAIN_MENU_SETTINGS_BUTTON);
+		data_->assets->load_texture("Exit Button", MAIN_MENU_EXIT_BUTTON);
 
-	void PauseState::Init()
-	{
-		m_Data->window.setView(m_Data->window.getDefaultView());
-		m_Data->assets.LoadTexture("Resume Button", MAIN_MENU_RESUME_BUTTON);
-		m_Data->assets.LoadTexture("Save Button", MAIN_MENU_SETTINGS_BUTTON);
-		m_Data->assets.LoadTexture("Exit Button", MAIN_MENU_EXIT_BUTTON);
-
-		m_Data->assets.LoadFont("Main Font", MAIN_FONT);
+		data_->assets->load_font("Main Font", MAIN_FONT);
 
 		// resume button
-		m_ResumeButton.setTexture(*m_Data->assets.GetTexture("Resume Button"));
+		resume_button_.setTexture(*data_->assets->get_texture("Resume Button"));
 
 		// m_ResumeButton.scale(newScaleFactor * 1.5f);
-		auto resumeButtonPosition = sf::Vector2f((SCREEN_WIDTH / 2) - (m_ResumeButton.getGlobalBounds().width / 2),
-			(SCREEN_HEIGHT / 3) - (m_ResumeButton.getGlobalBounds().height / 2));
-		m_ResumeButton.setPosition(resumeButtonPosition);
+		const auto resume_button_position = sf::Vector2f((static_cast<float>(SCREEN_WIDTH) / 2) - (resume_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(SCREEN_HEIGHT) / 3) - (resume_button_.getGlobalBounds().height / 2));
+		resume_button_.setPosition(resume_button_position);
 
 		// save button
-		m_SaveButton.setTexture(*m_Data->assets.GetTexture("Save Button"));
+		save_button_.setTexture(*data_->assets->get_texture("Save Button"));
 
 		// m_SaveButton.scale(newScaleFactor * 1.5f);
-		auto saveButtonPosition = sf::Vector2f(
-			resumeButtonPosition.x,
-			resumeButtonPosition.y + 1.5f * m_ResumeButton.getGlobalBounds().height);
-		m_SaveButton.setPosition(saveButtonPosition);
+		const auto save_button_position = sf::Vector2f(
+			resume_button_position.x,
+			resume_button_position.y + 1.5f * resume_button_.getGlobalBounds().height);
+		save_button_.setPosition(save_button_position);
 
 		// exit button
-		m_ExitButton.setTexture(*m_Data->assets.GetTexture("Exit Button"));
+		exit_button_.setTexture(*data_->assets->get_texture("Exit Button"));
 
 		// m_ExitButton.scale(newScaleFactor * 1.5f);
-		auto exitButtonPosition = sf::Vector2f(
-			saveButtonPosition.x,
-			saveButtonPosition.y + 1.5f * m_SaveButton.getGlobalBounds().height);
-		m_ExitButton.setPosition(exitButtonPosition);
+		const auto exit_button_position = sf::Vector2f(
+			save_button_position.x,
+			save_button_position.y + 1.5f * save_button_.getGlobalBounds().height);
+		exit_button_.setPosition(exit_button_position);
 
 		// set fonts and texts
-		auto mainFont = m_Data->assets.GetFont("Main Font");
+		const auto main_font = data_->assets->get_font("Main Font");
 
 		// resume button text
-		m_ResumeButtonText.setFont(*mainFont);
-		m_ResumeButtonText.setString(MAIN_MENU_RESUME_BUTTON_TEXT);
+		resume_button_text_.setFont(*main_font);
+		resume_button_text_.setString(MAIN_MENU_RESUME_BUTTON_TEXT);
 		// m_ResumeButtonText.scale(newScaleFactor * 1.5f);
-		m_ResumeButtonText.setFillColor(sf::Color::White);
+		resume_button_text_.setFillColor(sf::Color::White);
 
-		auto resumeButtonTextPosition = sf::Vector2f(
-			m_ResumeButton.getPosition().x + m_ResumeButton.getGlobalBounds().width / 2 - m_ResumeButtonText.getGlobalBounds().width / 2,
-			m_ResumeButton.getPosition().y + m_ResumeButton.getGlobalBounds().height / 2 - m_ResumeButtonText.getGlobalBounds().height);
-		m_ResumeButtonText.setPosition(resumeButtonTextPosition);
+		const auto resume_button_text_position = sf::Vector2f(
+			resume_button_.getPosition().x + resume_button_.getGlobalBounds().width / 2 - resume_button_text_.getGlobalBounds().width / 2,
+			resume_button_.getPosition().y + resume_button_.getGlobalBounds().height / 2 - resume_button_text_.getGlobalBounds().height);
+		resume_button_text_.setPosition(resume_button_text_position);
 
 		// save button text
-		m_SaveButtonText.setFont(*mainFont);
-		m_SaveButtonText.setString(MAIN_MENU_SAVE_BUTTON_TEXT);
+		save_button_text_.setFont(*main_font);
+		save_button_text_.setString(MAIN_MENU_SAVE_BUTTON_TEXT);
 		// m_SaveButtonText.scale(newScaleFactor * 1.5f);
-		m_SaveButtonText.setFillColor(sf::Color::White);
+		save_button_text_.setFillColor(sf::Color::White);
 
-		auto saveButtonTextPosition = sf::Vector2f(
-			m_SaveButton.getPosition().x + m_SaveButton.getGlobalBounds().width / 2 - m_SaveButtonText.getGlobalBounds().width / 2,
-			m_SaveButton.getPosition().y + m_SaveButton.getGlobalBounds().height / 2 - m_SaveButtonText.getGlobalBounds().height);
-		m_SaveButtonText.setPosition(saveButtonTextPosition);
+		const auto save_button_text_position = sf::Vector2f(
+			save_button_.getPosition().x + save_button_.getGlobalBounds().width / 2 - save_button_text_.getGlobalBounds().width / 2,
+			save_button_.getPosition().y + save_button_.getGlobalBounds().height / 2 - save_button_text_.getGlobalBounds().height);
+		save_button_text_.setPosition(save_button_text_position);
 
 		// exit button text
-		m_ExitButtonText.setFont(*mainFont);
-		m_ExitButtonText.setString(MAIN_MENU_EXIT_BUTTON_TEXT);
+		exit_button_text_.setFont(*main_font);
+		exit_button_text_.setString(MAIN_MENU_EXIT_BUTTON_TEXT);
 		// m_ExitButtonText.scale(newScaleFactor * 1.5f);
-		m_ExitButtonText.setFillColor(sf::Color::White);
+		exit_button_text_.setFillColor(sf::Color::White);
 
-		auto exitButtonTextPosition = sf::Vector2f(
-			m_ExitButton.getPosition().x + m_ExitButton.getGlobalBounds().width / 2 - m_ExitButtonText.getGlobalBounds().width / 2,
-			m_ExitButton.getPosition().y + m_ExitButton.getGlobalBounds().height / 2 - m_ExitButtonText.getGlobalBounds().height);
-		m_ExitButtonText.setPosition(exitButtonTextPosition);
+		const auto exit_button_text_position = sf::Vector2f(
+			exit_button_.getPosition().x + exit_button_.getGlobalBounds().width / 2 - exit_button_text_.getGlobalBounds().width / 2,
+			exit_button_.getPosition().y + exit_button_.getGlobalBounds().height / 2 - exit_button_text_.getGlobalBounds().height);
+		exit_button_text_.setPosition(exit_button_text_position);
 	}
 
-	void PauseState::HandleInput()
+	void pause_state::handle_input()
 	{
-		sf::Event event;
-		while (m_Data->window.pollEvent(event))
+		sf::Event event{};
+		while (data_->window->pollEvent(event))
 		{
 			if (sf::Event::Closed == event.type)
 			{
-				m_Data->window.close();
+				data_->window->close();
 			}
 
-			if (m_Data->input.IsKeyReleased(ge::InputKeys::Esc, &event))
+			if (data_->input->is_key_released(esc, std::make_shared<sf::Event>(event)))
 			{
 				std::cout << "Switch to the Game Screen from PauseState" << std::endl;
-				m_Data->machine.RemoveState();
+				data_->machine->remove_state();
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_ResumeButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(resume_button_, sf::Mouse::Left, data_->window))
 			{
 				std::cout << "Switch to the Game Screen from PauseState" << std::endl;
-				m_Data->machine.RemoveState();
+				data_->machine->remove_state();
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_SaveButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(save_button_, sf::Mouse::Left, data_->window))
 			{
 				std::cout << "Switch to the Save Screen from PauseState" << std::endl;
 				// ..
 			}
 
-			if (m_Data->input.IsSpriteClicked(&m_ExitButton, sf::Mouse::Left, &m_Data->window))
+			if (data_->input->is_sprite_clicked(exit_button_, sf::Mouse::Left, data_->window))
 			{
 				std::cout << "Switch to the Menu Screen from PauseState" << std::endl;
-				m_Data->machine.RemoveState();
-				m_Data->machine.AddState(StateRef(new MainMenuState(m_Data)), true);
+				data_->machine->remove_state();
+				data_->machine->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
 			}
 		}
 	}
 
-	void PauseState::Update(float deltaTime)
+	void pause_state::update(const float delta_time)
 	{
 		// empty
 	}
 
-	void PauseState::Draw(float deltaTime)
+	void pause_state::draw()
 	{
-		m_Data->window.clear();
+		data_->window->clear();
 
-		m_Data->window.draw(m_ResumeButton);
-		m_Data->window.draw(m_ResumeButtonText);
+		data_->window->draw(resume_button_);
+		data_->window->draw(resume_button_text_);
 
-		m_Data->window.draw(m_SaveButton);
-		m_Data->window.draw(m_SaveButtonText);
+		data_->window->draw(save_button_);
+		data_->window->draw(save_button_text_);
 
-		m_Data->window.draw(m_ExitButton);
-		m_Data->window.draw(m_ExitButtonText);
+		data_->window->draw(exit_button_);
+		data_->window->draw(exit_button_text_);
 
-		m_Data->window.display();
+		data_->window->display();
+	}
+
+	void pause_state::pause()
+	{
+	}
+
+	void pause_state::resume()
+	{
 	}
 }

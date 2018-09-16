@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <unordered_map>
-#include <utility>
 #include <mutex>
 
 #include "SFML/Graphics.hpp"
@@ -10,23 +9,26 @@
 #include "AssetManager.hpp"
 #include "TileBlock.hpp"
 
-struct Key
+namespace ge
 {
-	int x;
-	int y;
-
-	bool operator==(const Key &other) const
+	struct key
 	{
-		return (x == other.x && y == other.y);
-	}
-};
+		int x;
+		int y;
 
-namespace std {
+		bool operator==(const key &other) const
+		{
+			return (x == other.x && y == other.y);
+		}
+	};
+}
 
+namespace std 
+{
   template <>
-  struct hash<Key>
+  struct hash<ge::key>
   {
-    std::size_t operator()(const Key& k) const
+    std::size_t operator()(const ge::key& k) const
     {
       using std::size_t;
       using std::hash;
@@ -39,37 +41,41 @@ namespace std {
                ^ (hash<int>()(k.y) << 1)) >> 1);
     }
   };
-
 }
 
 class Map
 {
-private:
-	Key GetKey(sf::Vector2f coords);
-	std::vector<Key> GetNeighbors(Key key, unsigned int levels);
-
 public:
-	Map(ge::AssetManager* m_Assets) noexcept;
-	~Map();
+	explicit Map(std::shared_ptr<ge::asset_manager> assets) noexcept;
 
-	void GenerateMap();
-	void Draw(sf::RenderWindow* pWindow);
-	void SetView(sf::View* pView);
+	Map(const Map& other) = default;
+	Map(Map&& other) noexcept = default;
+	explicit Map(Map* other);
+	Map& operator=(const Map& other) = default;
+	Map& operator=(Map&& other) noexcept = default;
 
-public:
-	static const unsigned int tileSize = 64;
+	~Map() = default;
+
+	void generate_map();
+	void draw(sf::RenderWindow* p_window);
+	void set_view(const std::shared_ptr<sf::View>& p_view);
+
+	static const unsigned int tile_size = 64;
 
 private:
-	sf::View* m_pCurrentView = nullptr; // no view created here, do not free it
-	unsigned long long m_MatrixTileSize = 100;
-	sf::FloatRect m_ViewRectBounds;
-	sf::Vector2f m_ViewSize = { 0.f, 0.f };
-	std::unordered_map < Key, TileBlock* > m_TileBlocks;
-	sf::Vector2<int> m_BlockMaxTiles = { 0,0 };
-	sf::Vector2<int> m_BlockSize = { 0,0 };
+	ge::key get_key(sf::Vector2f coords) const;
+	std::vector<ge::key> get_neighbors(ge::key key, unsigned int levels) const;
 
-	std::mutex m_mtx;
+	std::shared_ptr<sf::View> p_current_view_ ;
+	unsigned long long matrix_tile_size_ = 100;
+	sf::FloatRect view_rect_bounds_;
+	sf::Vector2f view_size_ = { 0.f, 0.f };
+	std::unordered_map < ge::key, std::shared_ptr<tile_block>> tile_blocks_;
+	sf::Vector2<int> block_max_tiles_ = { 0,0 };
+	sf::Vector2<int> block_size_ = { 0,0 };
 
-	ge::AssetManager* m_Assets = nullptr;
+	//std::mutex mtx_;
+
+	std::shared_ptr<ge::asset_manager> assets_;
 };
 

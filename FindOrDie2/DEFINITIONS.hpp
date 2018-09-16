@@ -21,11 +21,6 @@
 #define MAIN_MENU_EXIT_BUTTON_TEXT "Exit"
 
 #define GAME_BACKGROUND "Resources/Sprites/Background/game_background_3.1.png"
-#define STATE_PLAYING 98
-#define STATE_PAUSE 97
-#define STATE_WON 96
-#define STATE_LOSE 95
-#define STATE_DRAW 94
 
 #define MAIN_MENU_RESUME_BUTTON MAIN_MENU_PLAY_BUTTON
 #define MAIN_MENU_RESUME_BUTTON_TEXT "Resume"

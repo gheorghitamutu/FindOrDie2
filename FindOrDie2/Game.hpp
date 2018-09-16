@@ -1,13 +1,10 @@
 #pragma once
 
-#include <iostream>
-#include <thread>
 #include <memory>
 #include <string>
 
 #include <SFML/Graphics.hpp>
 
-#include "Player.hpp"
 #include "Map.hpp"
 #include "StateMachine.hpp"
 #include "AssetManager.hpp"
@@ -15,33 +12,59 @@
 
 namespace ge
 {
-	struct GameData
+	struct game_data
 	{
-		StateMachine machine;
-		sf::RenderWindow window;
-		AssetManager assets;
-		InputManager input;
+		std::shared_ptr<state_machine>		machine = std::make_shared<state_machine>(state_machine());
+		sf::RenderWindow*					window = nullptr;
+		std::shared_ptr<asset_manager>		assets = std::make_shared<asset_manager>(asset_manager());
+		std::shared_ptr<input_manager>		input = std::make_shared<input_manager>(input_manager());
+
+		game_data() = default;
+
+		game_data(const game_data& other) = delete;
+		game_data(game_data&& other) noexcept = default;
+		explicit game_data(game_data* other) {};
+		game_data& operator=(const game_data& other) = delete;
+		game_data& operator=(game_data&& other) noexcept = delete;
+
+		~game_data()
+		{
+			delete window;
+		};
+
 	};
 
-	typedef std::shared_ptr<GameData> GameDataRef;
+	enum class game_progress
+	{
+		playing,
+		pause,
+		won,
+		lose,
+		draw 
+	};
 
-	class Game
+	class game
 	{
 	public:
-		Game(float windowWidth, float windowHeight, std::string gameTitle) noexcept;
-		~Game();
+		game(float window_width, float window_height, std::string game_title) noexcept;
+
+		game(const game& other) = default;
+		game(game&& other) noexcept = default;
+		game& operator=(const game& other) = delete;
+		game& operator=(game&& other) noexcept = delete;
+
+		~game() = default;
 
 	private:
-		void Run();
+		void run() const;
 
-	private:
-		unsigned int m_MaxFPS = 60;
+		unsigned int max_fps_ = 60;
 
-		const float m_DeltaTime = 1.0f / 60.0f;
+		const float delta_time_ = 1.0f / 60.0f;
 
-		sf::Clock m_Clock;
+		sf::Clock clock_;
 
-		GameDataRef m_Data = std::make_shared<GameData>();
+		std::shared_ptr<game_data> data_ = std::make_shared<game_data>(game_data());
 	};
 }
 
