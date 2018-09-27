@@ -15,7 +15,7 @@ namespace ge
 
 	void game_state::init()
 	{
-		p_map_ = std::make_shared<Map>(Map(data_->assets));
+		p_map_ = std::make_shared<map>(map(data_->assets));
 
 		data_->input->add_action(up, sf::Keyboard::Key::Up);
 		data_->input->add_action(down, sf::Keyboard::Key::Down);
@@ -36,8 +36,7 @@ namespace ge
 
 		p_map_->set_view(p_current_view_);
 
-		std::thread generate_map_thread(&Map::generate_map, p_map_);
-		generate_map_thread.detach();
+		p_map_->generate_map();
 	}
 
 	void game_state::handle_input()

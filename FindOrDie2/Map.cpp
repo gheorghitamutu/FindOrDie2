@@ -2,16 +2,16 @@
 
 #include "Map.hpp"
 
-Map::Map(std::shared_ptr<ge::asset_manager> assets) noexcept :
+map::map(std::shared_ptr<ge::asset_manager> assets) noexcept :
 	assets_(std::move(assets))
 {
 }
 
-Map::Map(Map* other)
+map::map(map* other)
 {
 }
 
-ge::key Map::get_key(const sf::Vector2f coords) const
+ge::key map::get_key(const sf::Vector2f coords) const
 {
 	float x_key = 0;
 
@@ -36,7 +36,7 @@ ge::key Map::get_key(const sf::Vector2f coords) const
 	return { static_cast<int>(x_key), static_cast<int>(y_key) };
 }
 
-std::vector<ge::key> Map::get_neighbors(const ge::key key, const unsigned int levels) const
+std::vector<ge::key> map::get_neighbors(const ge::key key, const unsigned int levels) const
 {
 	std::vector<ge::key> blocks_coords;
 
@@ -92,7 +92,7 @@ std::vector<ge::key> Map::get_neighbors(const ge::key key, const unsigned int le
 	return blocks_coords;
 }
 
-void Map::generate_map()
+void map::generate_map()
 {
 	for (auto i = 0ULL; i < matrix_tile_size_; i++)
 	{
@@ -104,7 +104,6 @@ void Map::generate_map()
 					rock_solid,
 					visible,
 					land,
-					seen,
 					assets_));
 
 			this_tile->get_body()->setOrigin({
@@ -112,15 +111,12 @@ void Map::generate_map()
 					static_cast<float>(tile_size) / 2.f });
 
 			// flat surface formula
-			const auto tile_position_x = j * 32.0f;
-			const auto tile_position_y = i * 16.0f + j * 16.0f;
+			const auto tile_position_x = j * tile_size / 2;
+			const auto tile_position_y = i * tile_size / 4 + j * tile_size / 4;
 			this_tile->get_body()->setPosition({ tile_position_x,  tile_position_y});
 
 			ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y });
 
-			//mtx_.lock();
-
-			// you lock the inserting operation in order to draw while generating the map
 			{
 				if (tile_blocks_.find(tile_chunk_position) == tile_blocks_.end())
 				{
@@ -129,25 +125,17 @@ void Map::generate_map()
 
 				tile_blocks_[tile_chunk_position]->get_tiles()->emplace_back(this_tile);
 			}
-			// you unlock it after you insert a tile
-
-			//mtx_.unlock();
 		}
 	}
 }
 
-void Map::draw(sf::RenderWindow* p_window)
+void map::draw(sf::RenderWindow* p_window)
 {
 	const auto view_center = p_current_view_->getCenter();
 
 	const auto chunk_position = get_key(view_center);
 
-	auto chunk_identifiers = get_neighbors(chunk_position, 1);
-
-	// mtx_.lock();
-
-	// you lock the query operation in order to draw on the screen only what's already
-	// generated and required for the current view
+	auto chunk_identifiers = get_neighbors(chunk_position, 2);
 
 	// you get all tiles from all blocks in the view center into one vector of tiles
 	std::vector<std::shared_ptr<tile>> tiles;
@@ -164,7 +152,7 @@ void Map::draw(sf::RenderWindow* p_window)
 		}
 
 		// then you sort the tiles in order to draw them isometric and not overlap them
-		std::sort(tiles.begin(), tiles.end(), [](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
+		std::sort(tiles.begin(), tiles.end(), [&](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
 		{
 			const auto a_body = a->get_body();
 			const auto b_body = b->get_body();
@@ -180,24 +168,25 @@ void Map::draw(sf::RenderWindow* p_window)
 			p_window->draw(*tile->get_body());
 		}
 	}
-	// you unlock it
-
-	// mtx_.unlock();
 }
 
-void Map::set_view(const std::shared_ptr<sf::View>& p_view)
+void map::set_view(const std::shared_ptr<sf::View>& p_view)
 {
 	p_current_view_ = p_view;
 
 	view_size_ = p_current_view_->getSize();
 
 	// tiles contained by a block relative to view size and tile size
-	block_max_tiles_ = { 
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / tile_size / 2),
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.y / tile_size / 2) };
+	block_max_tiles_ =
+		{ 
+			(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / tile_size / 2),
+			(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.y / tile_size / 2) 
+		};
 
 	// block size relative to view size (1/4 view size)
-	block_size_ = { 
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / 2),
-		(view_size_.y == 0) ? 0 : static_cast<int>(view_size_.y / 2) };
+	block_size_ = 
+		{ 
+			(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / 2),
+			(view_size_.y == 0) ? 0 : static_cast<int>(view_size_.y / 2) 
+		};
 }

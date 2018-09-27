@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include <mutex>
+#include <future>
 
 #include "SFML/Graphics.hpp"
 
@@ -43,18 +43,18 @@ namespace std
   };
 }
 
-class Map
+class map
 {
 public:
-	explicit Map(std::shared_ptr<ge::asset_manager> assets) noexcept;
+	explicit map(std::shared_ptr<ge::asset_manager> assets) noexcept;
 
-	Map(const Map& other) = default;
-	Map(Map&& other) noexcept = default;
-	explicit Map(Map* other);
-	Map& operator=(const Map& other) = default;
-	Map& operator=(Map&& other) noexcept = default;
+	map(const map& other) = default;
+	map(map&& other) noexcept = default;
+	explicit map(map* other);
+	map& operator=(const map& other) = default;
+	map& operator=(map&& other) noexcept = default;
 
-	~Map() = default;
+	~map() = default;
 
 	void generate_map();
 	void draw(sf::RenderWindow* p_window);
@@ -73,8 +73,6 @@ private:
 	std::unordered_map < ge::key, std::shared_ptr<tile_block>> tile_blocks_;
 	sf::Vector2<int> block_max_tiles_ = { 0,0 };
 	sf::Vector2<int> block_size_ = { 0,0 };
-
-	//std::mutex mtx_;
 
 	std::shared_ptr<ge::asset_manager> assets_;
 };

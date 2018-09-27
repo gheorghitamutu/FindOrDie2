@@ -34,7 +34,7 @@ namespace ge
 
 		sf::Clock clock_;
 
-		std::shared_ptr<Map> p_map_;
+		std::shared_ptr<map> p_map_;
 
 		std::shared_ptr<player> p_player_;
 

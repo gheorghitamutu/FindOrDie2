@@ -25,17 +25,11 @@ enum tile_usage
 	wall
 };
 
-enum tile_state
-{
-	seen,
-	hidden
-};
-
 class tile
 {
 public:
 	tile(const std::string& name, tile_type type, tile_appearance appearance, 
-		tile_usage usage, tile_state state, const std::shared_ptr<ge::asset_manager>& assets);
+		tile_usage usage, const std::shared_ptr<ge::asset_manager>& assets);
 	
 	tile(const tile& other) = default;
 	tile(tile&& other) noexcept = default;
@@ -55,6 +49,5 @@ private:
 	tile_type type_ = rock_solid;
 	tile_appearance appearance_ = visible;
 	tile_usage usage_ = land;
-	tile_state state_ = seen;
 };
 

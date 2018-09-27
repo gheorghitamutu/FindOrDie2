@@ -1,11 +1,10 @@
 #include "Tile.hpp"
 
 tile::tile(const std::string& name, const tile_type type, const tile_appearance appearance,
-           const tile_usage usage, const tile_state state, const std::shared_ptr<ge::asset_manager>& assets) :
+           const tile_usage usage, const std::shared_ptr<ge::asset_manager>& assets) :
 	type_(type),
 	appearance_(appearance),
-	usage_(usage),
-	state_(state)
+	usage_(usage)
 {
 	body_ = std::make_shared<sf::Sprite>(sf::Sprite());
 
