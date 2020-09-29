@@ -2,14 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "InputManager.hpp"
-#include "AssetManager.hpp"
 #include "Animation.hpp"
+#include "Game.hpp"
 
 class player
 {
 public:
-	player(const std::shared_ptr<ge::asset_manager>& assets, std::shared_ptr<ge::input_manager> input) noexcept;
+	player(std::shared_ptr<ge::game_data>& data) noexcept;
 
 	player(const player& other) = default;
 	player(player&& other) noexcept = default;
@@ -75,7 +74,6 @@ private:
 	int number_of_frames_ = 7;
 	float hold_time_ = 0.1f;
 
-	std::shared_ptr<ge::asset_manager> assets_;
-	std::shared_ptr<ge::input_manager> input_;
+	std::shared_ptr<ge::game_data> data_;
 };
 

@@ -9,7 +9,7 @@
 namespace ge
 {
 	splash_state::splash_state(const std::shared_ptr<game_data>& data) :
-		data_(std::move(data))
+		data_(data)
 	{
 	}
 
@@ -22,9 +22,11 @@ namespace ge
 		const auto texture = data_->assets->get_texture("Splash State Background");
 		background_.setTexture(*texture);
 
+		const auto window_size = data_->window->getSize();
+
 		// resize the background to fit any resolution
 		const auto texture_size = texture->getSize();
-		const auto scale_factor = sf::Vector2f(static_cast<float>(SCREEN_WIDTH) / texture_size.x, static_cast<float>(SCREEN_HEIGHT) / texture_size.y);
+		const auto scale_factor = sf::Vector2f(static_cast<float>(window_size.x) / texture_size.x, static_cast<float>(window_size.y) / texture_size.y);
 		const auto current_scale_factor = background_.getScale();
 		const auto new_scale_factor = sf::Vector2f(current_scale_factor.x * scale_factor.x, current_scale_factor.y * scale_factor.y);
 		background_.scale(new_scale_factor);

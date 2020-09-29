@@ -25,8 +25,9 @@ namespace ge
 		resume_button_.setTexture(*data_->assets->get_texture("Resume Button"));
 
 		// m_ResumeButton.scale(newScaleFactor * 1.5f);
-		const auto resume_button_position = sf::Vector2f((static_cast<float>(SCREEN_WIDTH) / 2) - (resume_button_.getGlobalBounds().width / 2),
-			(static_cast<float>(SCREEN_HEIGHT) / 3) - (resume_button_.getGlobalBounds().height / 2));
+		const auto window_size = data_->window->getSize();
+		const auto resume_button_position = sf::Vector2f((static_cast<float>(window_size.x) / 2) - (resume_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(window_size.y) / 3) - (resume_button_.getGlobalBounds().height / 2));
 		resume_button_.setPosition(resume_button_position);
 
 		// save button

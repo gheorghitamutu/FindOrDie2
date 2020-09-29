@@ -42,7 +42,7 @@ namespace ge
 	class game
 	{
 	public:
-		game(float window_width, float window_height, std::string game_title) noexcept;
+		game() noexcept;
 
 		game(const game& other) = default;
 		game(game&& other) noexcept = default;
@@ -57,6 +57,8 @@ namespace ge
 		const unsigned int max_fps_ = 60;
 
 		const float delta_time_ = 1.0f / 60.0f;
+
+		const float max_frame_time = 0.25f;
 
 		sf::Clock clock_;
 

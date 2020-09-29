@@ -1,16 +1,15 @@
 #include "Game.hpp"
 #include "SplashState.hpp"
+#include "DEFINITIONS.hpp"
 
 namespace ge
 {
-	game::game(const float window_width, const float window_height, const std::string game_title) noexcept
+	game::game() noexcept
 	{
 		data_->window.reset(		
 				new sf::RenderWindow(
-				sf::VideoMode(
-					static_cast<unsigned int>(window_width), 
-					static_cast<unsigned int>(window_height)),
-				game_title,
+				sf::VideoMode(sf::VideoMode::getFullscreenModes()[0]),
+				sf::String(GAME_TITLE),
 				sf::Style::Close | sf::Style::Titlebar));
 
 		data_->machine->add_state(std::make_shared<splash_state>(splash_state(data_)));
@@ -31,12 +30,7 @@ namespace ge
 
 			// calculate time between events
 			const auto new_time = clock_.getElapsedTime().asSeconds();
-			auto frame_time = new_time - current_time;
-
-			if (frame_time > 0.25f)
-			{
-				frame_time = 0.25f;
-			}
+			const auto frame_time = std::min(new_time - current_time, max_frame_time);
 
 			current_time = new_time;
 			accumulator += frame_time;
@@ -46,8 +40,9 @@ namespace ge
 				data_->machine->get_active_state()->handle_input();
 				data_->machine->get_active_state()->update(delta_time_);
 
-				accumulator -= delta_time_;
+				accumulator = std::max(accumulator -= delta_time_, 0.0f);
 			}
+
 			data_->machine->get_active_state()->draw();
 		}
 	}

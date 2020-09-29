@@ -1,22 +1,23 @@
 #include "Player.hpp"
-#include "Game.hpp"
 #include "DEFINITIONS.hpp"
 
 #include <iostream>
 
-player::player(const std::shared_ptr<ge::asset_manager>& assets, const std::shared_ptr<ge::input_manager> input) noexcept
+player::player(std::shared_ptr<ge::game_data>& data) noexcept :
+	data_(data)
 {
 	body_.setOrigin(texture_size / 2, texture_size / 2);
-	body_.setScale({ 1.0f, 1.0f });
+	body_.setScale({ 1.0f, 0.5f });
 	body_.setPosition({ 0.0f, 0.0f });
 
+	const auto window_size = data_->window->getSize();
+
 	p_view_ = std::make_shared<sf::View>(sf::View());
-	p_view_->setSize({ SCREEN_HEIGHT, SCREEN_WIDTH });
+	p_view_->setSize({ static_cast<float>(window_size.x), static_cast<float>(window_size.y) });
 	p_view_->zoom(1.0f);
 	p_view_->setCenter({ 0,0 });
 
-	assets_ = assets;
-	const auto texture_required = assets_->get_texture("Player_Man");
+	const auto texture_required = data_->assets->get_texture("Player_Man");
 	
 	for (auto i = 0; i < int(animation_index::count); i++)
 	{
@@ -30,8 +31,6 @@ player::player(const std::shared_ptr<ge::asset_manager>& assets, const std::shar
 				number_of_frames_,
 				hold_time_));
 	}
-
-	input_ = input;
 }
 
 void player::update(const float elapsed_sec)
@@ -136,19 +135,19 @@ void player::process_events(const std::shared_ptr<sf::Event>& event)
 {
 	direction_ = { 0, 0 };
 
-	if (input_->is_key_pressed(ge::input_keys::up))
+	if (data_->input->is_key_pressed(ge::input_keys::up))
 	{
 		direction_.y = -1;
 	}
-	if (input_->is_key_pressed(ge::input_keys::down))
+	if (data_->input->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.y = 1;
 	}
-	if (input_->is_key_pressed(ge::input_keys::left))
+	if (data_->input->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = -1;
 	}
-	if (input_->is_key_pressed(ge::input_keys::right))
+	if (data_->input->is_key_pressed(ge::input_keys::right))
 	{
 		direction_.x = 1;
 	}
@@ -159,21 +158,21 @@ void player::process_events(const std::shared_ptr<sf::Event>& event)
 		direction_.y *= 2;
 	}
 
-	if (input_->is_key_pressed(ge::input_keys::right) && 
-		input_->is_key_pressed(ge::input_keys::left))
+	if (data_->input->is_key_pressed(ge::input_keys::right) &&
+		data_->input->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (input_->is_key_pressed(ge::input_keys::up) && 
-		input_->is_key_pressed(ge::input_keys::down))
+	if (data_->input->is_key_pressed(ge::input_keys::up) &&
+		data_->input->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (input_->is_key_released(ge::input_keys::c, event))
+	if (data_->input->is_key_released(ge::input_keys::c, event))
 	{
 		is_focused_ = !is_focused_;
 	}

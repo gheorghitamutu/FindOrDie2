@@ -13,7 +13,8 @@ public:
 
 	~tile_block() = default;
 
-	std::shared_ptr<std::vector<std::shared_ptr<tile>>> get_tiles() const;
+	const std::shared_ptr<std::vector<std::shared_ptr<tile>>>* get_tiles() const;
+	void emplace_back(std::shared_ptr<tile> tile);
 	
 private:
 	std::shared_ptr<std::vector<std::shared_ptr<tile>>> m_tiles_ = 

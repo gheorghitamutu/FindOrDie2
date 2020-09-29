@@ -60,7 +60,7 @@ public:
 	void draw(const std::unique_ptr<sf::RenderWindow>& p_window);
 	void set_view(const std::shared_ptr<sf::View>& p_view);
 
-	static const unsigned int tile_size = 64;
+	const unsigned int tile_size_ = 64;
 
 private:
 	ge::key get_key(sf::Vector2f coords) const;
@@ -70,7 +70,7 @@ private:
 	const unsigned int matrix_tile_size_ = 100;
 	sf::FloatRect view_rect_bounds_;
 	sf::Vector2f view_size_ = { 0.f, 0.f };
-	std::unordered_map < ge::key, std::shared_ptr<tile_block>> tile_blocks_;
+	std::unordered_map <ge::key, std::shared_ptr<tile_block>> tile_blocks_;
 	sf::Vector2<int> block_max_tiles_ = { 0,0 };
 	sf::Vector2<int> block_size_ = { 0,0 };
 

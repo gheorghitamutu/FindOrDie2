@@ -27,7 +27,8 @@ namespace ge
 		background_.setTexture(*background_texture);
 
 		const auto texture_size = background_texture->getSize();
-		const auto scale_factor = sf::Vector2f(static_cast<float>(SCREEN_WIDTH) / texture_size.x, static_cast<float>(SCREEN_HEIGHT) / texture_size.y);
+		const auto window_size = data_->window->getSize();
+		const auto scale_factor = sf::Vector2f(static_cast<float>(window_size.x) / texture_size.x, static_cast<float>(window_size.y) / texture_size.y);
 		const auto current_scale_factor = background_.getScale();
 		const auto new_scale_factor = sf::Vector2f(current_scale_factor.x * scale_factor.x, current_scale_factor.y * scale_factor.y);
 		background_.scale(new_scale_factor);
@@ -36,16 +37,16 @@ namespace ge
 		title_button_.setTexture(*data_->assets->get_texture("Game Title"));
 		title_button_.scale(new_scale_factor * 2.5f);
 		const auto title_position = sf::Vector2f(
-			(static_cast<float>(SCREEN_WIDTH) / 2) - (title_button_.getGlobalBounds().width / 2),
-			(static_cast<float>(SCREEN_HEIGHT) / 3) - (title_button_.getGlobalBounds().height / 2));
+			(static_cast<float>(window_size.x) / 2) - (title_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(window_size.y) / 3) - (title_button_.getGlobalBounds().height / 2));
 		title_button_.setPosition(title_position);
 
 		// play button
 		play_button_.setTexture(*data_->assets->get_texture("Play Button"));
 
 		play_button_.scale(new_scale_factor * 1.5f);
-		const auto play_button_position = sf::Vector2f((static_cast<float>(SCREEN_WIDTH) / 2) - (play_button_.getGlobalBounds().width / 2),
-			(static_cast<float>(SCREEN_HEIGHT) / 2) - (play_button_.getGlobalBounds().height / 2));
+		const auto play_button_position = sf::Vector2f((static_cast<float>(window_size.x) / 2) - (play_button_.getGlobalBounds().width / 2),
+			(static_cast<float>(window_size.y) / 2) - (play_button_.getGlobalBounds().height / 2));
 		play_button_.setPosition(play_button_position);
 
 		// settings button

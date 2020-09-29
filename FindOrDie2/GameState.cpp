@@ -24,14 +24,16 @@ namespace ge
 		data_->input->add_action(c, sf::Keyboard::Key::C);
 		data_->input->add_action(esc, sf::Keyboard::Key::Escape);
 
+		const auto window_size = data_->window->getSize();
+
 		p_default_view_ = std::make_shared<sf::View>(sf::View());
-		p_default_view_->setSize({ static_cast<float>(SCREEN_HEIGHT), static_cast<float>(SCREEN_WIDTH) });
+		p_default_view_->setSize({ static_cast<float>(window_size.x), static_cast<float>(window_size.y) });
 		p_default_view_->zoom(1.0f);
 		p_default_view_->setCenter({ 0,0 });
 
 		p_current_view_ = p_default_view_;
 
-		p_player_ = std::make_shared<player>(player(data_->assets, data_->input));
+		p_player_ = std::make_shared<player>(player(data_));
 		p_current_view_ = p_player_->get_view();
 
 		p_map_->set_view(p_current_view_);

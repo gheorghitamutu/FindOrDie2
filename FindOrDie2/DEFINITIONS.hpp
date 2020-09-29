@@ -2,12 +2,9 @@
 
 constexpr const char* const GAME_TITLE = "Find Or Die 2";
 
-constexpr unsigned int SCREEN_WIDTH = 1024;
-constexpr unsigned int SCREEN_HEIGHT = 768;
-
 constexpr const char* const MAIN_FONT = "Resources/Fonts/kenvector_future_thin.ttf";
 
-constexpr unsigned int SPLASH_TIMEOUT = 3;
+constexpr unsigned int SPLASH_TIMEOUT = 2;
 constexpr const char* const SPLASH_BACKGROUND = "Resources/Sprites/Background/game_background_1.png";
 
 constexpr const char* const MAIN_MENU_BACKGROUND = "Resources/Sprites/Background/game_background_2.png";
