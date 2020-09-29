@@ -57,7 +57,7 @@ public:
 	~map() = default;
 
 	void generate_map();
-	void draw(sf::RenderWindow* p_window);
+	void draw(const std::unique_ptr<sf::RenderWindow>& p_window);
 	void set_view(const std::shared_ptr<sf::View>& p_view);
 
 	static const unsigned int tile_size = 64;
@@ -67,7 +67,7 @@ private:
 	std::vector<ge::key> get_neighbors(ge::key key, unsigned int levels) const;
 
 	std::shared_ptr<sf::View> p_current_view_ ;
-	unsigned long long matrix_tile_size_ = 100;
+	const unsigned int matrix_tile_size_ = 100;
 	sf::FloatRect view_rect_bounds_;
 	sf::Vector2f view_size_ = { 0.f, 0.f };
 	std::unordered_map < ge::key, std::shared_ptr<tile_block>> tile_blocks_;

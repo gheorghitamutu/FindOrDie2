@@ -32,7 +32,7 @@ namespace ge
 		bool is_key_pressed(int id);
 		bool is_key_released(int id, const std::shared_ptr<sf::Event>& event);
 
-		bool is_sprite_clicked(sf::Sprite& object, sf::Mouse::Button button, sf::RenderWindow* p_window) const;
+		bool is_sprite_clicked(sf::Sprite& object, sf::Mouse::Button button, const std::unique_ptr<sf::RenderWindow>& p_window) const;
 		
 		sf::Vector2i get_mouse_position(const std::unique_ptr<sf::RenderWindow> p_window) const;
 

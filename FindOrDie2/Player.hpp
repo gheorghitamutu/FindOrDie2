@@ -19,7 +19,7 @@ public:
 	~player() = default;
 
 	void update(float elapsed_sec);
-	void draw(sf::RenderWindow* p_window) const;
+	void draw(const std::unique_ptr<sf::RenderWindow>& p_window) const;
 	sf::Vector2f get_position() const;
 	void change_focus();
 	std::shared_ptr<sf::View> get_view() const;

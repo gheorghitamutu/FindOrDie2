@@ -94,9 +94,9 @@ std::vector<ge::key> map::get_neighbors(const ge::key key, const unsigned int le
 
 void map::generate_map()
 {
-	for (auto i = 0ULL; i < matrix_tile_size_; i++)
+	for (auto i = 0U; i < matrix_tile_size_; i++)
 	{
-		for (auto j = 0ULL; j < matrix_tile_size_; j++)
+		for (auto j = 0U; j < matrix_tile_size_; j++)
 		{
 			auto this_tile = 
 				std::make_shared<tile>(tile(
@@ -111,8 +111,8 @@ void map::generate_map()
 					static_cast<float>(tile_size) / 2.f });
 
 			// flat surface formula
-			const auto tile_position_x = j * tile_size / 2;
-			const auto tile_position_y = i * tile_size / 4 + j * tile_size / 4;
+			const float tile_position_x = j * static_cast<float>(tile_size) / 2;
+			const float tile_position_y = i * static_cast<float>(tile_size) / 4 + j * static_cast<float>(tile_size) / 4;
 			this_tile->get_body()->setPosition({ tile_position_x,  tile_position_y});
 
 			ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y });
@@ -129,7 +129,7 @@ void map::generate_map()
 	}
 }
 
-void map::draw(sf::RenderWindow* p_window)
+void map::draw(const std::unique_ptr<sf::RenderWindow>& p_window)
 {
 	const auto view_center = p_current_view_->getCenter();
 

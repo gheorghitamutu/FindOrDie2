@@ -5,12 +5,14 @@ namespace ge
 {
 	game::game(const float window_width, const float window_height, const std::string game_title) noexcept
 	{
-		data_->window = new sf::RenderWindow(
-			sf::VideoMode(
-				static_cast<unsigned int>(window_width), 
-				static_cast<unsigned int>(window_height)),
-			game_title,
-			sf::Style::Close | sf::Style::Titlebar);
+		data_->window.reset(		
+				new sf::RenderWindow(
+				sf::VideoMode(
+					static_cast<unsigned int>(window_width), 
+					static_cast<unsigned int>(window_height)),
+				game_title,
+				sf::Style::Close | sf::Style::Titlebar));
+
 		data_->machine->add_state(std::make_shared<splash_state>(splash_state(data_)));
 
 		data_->window->setFramerateLimit(max_fps_);

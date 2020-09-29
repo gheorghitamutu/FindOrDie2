@@ -14,10 +14,10 @@ namespace ge
 {
 	struct game_data
 	{
-		std::shared_ptr<state_machine>		machine = std::make_shared<state_machine>(state_machine());
-		sf::RenderWindow*					window = nullptr;
-		std::shared_ptr<asset_manager>		assets = std::make_shared<asset_manager>(asset_manager());
-		std::shared_ptr<input_manager>		input = std::make_shared<input_manager>(input_manager());
+		std::shared_ptr<state_machine> machine = std::make_shared<state_machine>(state_machine());
+		std::unique_ptr<sf::RenderWindow> window;
+		std::shared_ptr<asset_manager> assets = std::make_shared<asset_manager>(asset_manager());
+		std::shared_ptr<input_manager> input = std::make_shared<input_manager>(input_manager());
 
 		game_data() = default;
 
@@ -27,11 +27,7 @@ namespace ge
 		game_data& operator=(const game_data& other) = delete;
 		game_data& operator=(game_data&& other) noexcept = delete;
 
-		~game_data()
-		{
-			delete window;
-		};
-
+		~game_data() = default;
 	};
 
 	enum class game_progress
@@ -58,7 +54,7 @@ namespace ge
 	private:
 		void run() const;
 
-		unsigned int max_fps_ = 60;
+		const unsigned int max_fps_ = 60;
 
 		const float delta_time_ = 1.0f / 60.0f;
 

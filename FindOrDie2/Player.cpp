@@ -100,7 +100,7 @@ void player::update(const float elapsed_sec)
 	}
 }
 
-void player::draw(sf::RenderWindow* p_window) const
+void player::draw(const std::unique_ptr<sf::RenderWindow>& p_window) const
 {
 	const auto view_center = p_view_->getCenter();
 	const auto view_size = p_view_->getSize();
