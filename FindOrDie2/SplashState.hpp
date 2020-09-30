@@ -10,7 +10,7 @@ namespace ge
 	class splash_state : public state
 	{
 	public:
-		explicit splash_state(const std::shared_ptr<game_data>& data);
+		explicit splash_state(const std::shared_ptr<game_context>& data);
 
 		splash_state(const splash_state& other) = default;
 		splash_state(splash_state&& other) noexcept = default;
@@ -29,7 +29,7 @@ namespace ge
 		void resume() override;
 
 	private:
-		std::shared_ptr<game_data> data_;
+		std::shared_ptr<game_context> data_;
 
 		sf::Clock clock_;
 

@@ -8,21 +8,21 @@
 
 namespace ge
 {
-	splash_state::splash_state(const std::shared_ptr<game_data>& data) :
+	splash_state::splash_state(const std::shared_ptr<game_context>& data) :
 		data_(data)
 	{
 	}
 
 	void splash_state::init()
 	{
-		data_->assets->load_texture(
+		data_->asset_manager_->load_texture(
 			"Splash State Background", 
 			SPLASH_BACKGROUND);
 
-		const auto texture = data_->assets->get_texture("Splash State Background");
+		const auto texture = data_->asset_manager_->get_texture("Splash State Background");
 		background_.setTexture(*texture);
 
-		const auto window_size = data_->window->getSize();
+		const auto window_size = data_->render_window_->getSize();
 
 		// resize the background to fit any resolution
 		const auto texture_size = texture->getSize();
@@ -36,11 +36,11 @@ namespace ge
 	{
 		sf::Event event{};
 
-		while (data_->window->pollEvent(event))
+		while (data_->render_window_->pollEvent(event))
 		{
 			if (sf::Event::Closed == event.type)
 			{
-				data_->window->close();
+				data_->render_window_->close();
 			}
 		}
 	}
@@ -51,17 +51,17 @@ namespace ge
 		{
 			// Switch to the Main Menu
 			std::cout << "Switch to the Main Menu" << std::endl;
-			data_->machine->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
+			data_->machine_->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
 		}
 	}
 
 	void splash_state::draw()
 	{
-		data_->window->clear(sf::Color::Black);
+		data_->render_window_->clear(sf::Color::Black);
 
-		data_->window->draw(background_);
+		data_->render_window_->draw(background_);
 
-		data_->window->display();
+		data_->render_window_->display();
 	}
 
 	void splash_state::pause()

@@ -7,31 +7,31 @@
 
 namespace ge
 {
-	pause_state::pause_state(std::shared_ptr<game_data> data) :
+	pause_state::pause_state(std::shared_ptr<game_context> data) :
 		data_(std::move(data))
 	{
 	}
 
 	void pause_state::init()
 	{
-		data_->window->setView(data_->window->getDefaultView());
-		data_->assets->load_texture("Resume Button", MAIN_MENU_RESUME_BUTTON);
-		data_->assets->load_texture("Save Button", MAIN_MENU_SETTINGS_BUTTON);
-		data_->assets->load_texture("Exit Button", MAIN_MENU_EXIT_BUTTON);
+		data_->render_window_->setView(data_->render_window_->getDefaultView());
+		data_->asset_manager_->load_texture("Resume Button", MAIN_MENU_RESUME_BUTTON);
+		data_->asset_manager_->load_texture("Save Button", MAIN_MENU_SETTINGS_BUTTON);
+		data_->asset_manager_->load_texture("Exit Button", MAIN_MENU_EXIT_BUTTON);
 
-		data_->assets->load_font("Main Font", MAIN_FONT);
+		data_->asset_manager_->load_font("Main Font", MAIN_FONT);
 
 		// resume button
-		resume_button_.setTexture(*data_->assets->get_texture("Resume Button"));
+		resume_button_.setTexture(*data_->asset_manager_->get_texture("Resume Button"));
 
 		// m_ResumeButton.scale(newScaleFactor * 1.5f);
-		const auto window_size = data_->window->getSize();
+		const auto window_size = data_->render_window_->getSize();
 		const auto resume_button_position = sf::Vector2f((static_cast<float>(window_size.x) / 2) - (resume_button_.getGlobalBounds().width / 2),
 			(static_cast<float>(window_size.y) / 3) - (resume_button_.getGlobalBounds().height / 2));
 		resume_button_.setPosition(resume_button_position);
 
 		// save button
-		save_button_.setTexture(*data_->assets->get_texture("Save Button"));
+		save_button_.setTexture(*data_->asset_manager_->get_texture("Save Button"));
 
 		// m_SaveButton.scale(newScaleFactor * 1.5f);
 		const auto save_button_position = sf::Vector2f(
@@ -40,7 +40,7 @@ namespace ge
 		save_button_.setPosition(save_button_position);
 
 		// exit button
-		exit_button_.setTexture(*data_->assets->get_texture("Exit Button"));
+		exit_button_.setTexture(*data_->asset_manager_->get_texture("Exit Button"));
 
 		// m_ExitButton.scale(newScaleFactor * 1.5f);
 		const auto exit_button_position = sf::Vector2f(
@@ -49,7 +49,7 @@ namespace ge
 		exit_button_.setPosition(exit_button_position);
 
 		// set fonts and texts
-		const auto main_font = data_->assets->get_font("Main Font");
+		const auto main_font = data_->asset_manager_->get_font("Main Font");
 
 		// resume button text
 		resume_button_text_.setFont(*main_font);
@@ -88,36 +88,36 @@ namespace ge
 	void pause_state::handle_input()
 	{
 		sf::Event event{};
-		while (data_->window->pollEvent(event))
+		while (data_->render_window_->pollEvent(event))
 		{
 			if (sf::Event::Closed == event.type)
 			{
-				data_->window->close();
+				data_->render_window_->close();
 			}
 
-			if (data_->input->is_key_released(esc, std::make_shared<sf::Event>(event)))
+			if (data_->input_manager_->is_key_released(esc, std::make_shared<sf::Event>(event)))
 			{
 				std::cout << "Switch to the Game Screen from PauseState" << std::endl;
-				data_->machine->remove_state();
+				data_->machine_->remove_state();
 			}
 
-			if (data_->input->is_sprite_clicked(resume_button_, sf::Mouse::Left, data_->window))
+			if (data_->input_manager_->is_sprite_clicked(resume_button_, sf::Mouse::Left, data_->render_window_))
 			{
 				std::cout << "Switch to the Game Screen from PauseState" << std::endl;
-				data_->machine->remove_state();
+				data_->machine_->remove_state();
 			}
 
-			if (data_->input->is_sprite_clicked(save_button_, sf::Mouse::Left, data_->window))
+			if (data_->input_manager_->is_sprite_clicked(save_button_, sf::Mouse::Left, data_->render_window_))
 			{
 				std::cout << "Switch to the Save Screen from PauseState" << std::endl;
 				// ..
 			}
 
-			if (data_->input->is_sprite_clicked(exit_button_, sf::Mouse::Left, data_->window))
+			if (data_->input_manager_->is_sprite_clicked(exit_button_, sf::Mouse::Left, data_->render_window_))
 			{
 				std::cout << "Switch to the Menu Screen from PauseState" << std::endl;
-				data_->machine->remove_state();
-				data_->machine->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
+				data_->machine_->remove_state();
+				data_->machine_->add_state(std::make_shared<main_menu_state>(main_menu_state(data_)), true);
 			}
 		}
 	}
@@ -129,18 +129,18 @@ namespace ge
 
 	void pause_state::draw()
 	{
-		data_->window->clear();
+		data_->render_window_->clear();
 
-		data_->window->draw(resume_button_);
-		data_->window->draw(resume_button_text_);
+		data_->render_window_->draw(resume_button_);
+		data_->render_window_->draw(resume_button_text_);
 
-		data_->window->draw(save_button_);
-		data_->window->draw(save_button_text_);
+		data_->render_window_->draw(save_button_);
+		data_->render_window_->draw(save_button_text_);
 
-		data_->window->draw(exit_button_);
-		data_->window->draw(exit_button_text_);
+		data_->render_window_->draw(exit_button_);
+		data_->render_window_->draw(exit_button_text_);
 
-		data_->window->display();
+		data_->render_window_->display();
 	}
 
 	void pause_state::pause()

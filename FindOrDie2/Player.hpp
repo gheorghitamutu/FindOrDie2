@@ -8,7 +8,7 @@
 class player
 {
 public:
-	player(std::shared_ptr<ge::game_data>& data) noexcept;
+	player(std::shared_ptr<ge::game_context>& data) noexcept;
 
 	player(const player& other) = default;
 	player(player&& other) noexcept = default;
@@ -18,10 +18,10 @@ public:
 	~player() = default;
 
 	void update(float elapsed_sec);
-	void draw(const std::unique_ptr<sf::RenderWindow>& p_window) const;
+	void draw() const;
 	sf::Vector2f get_position() const;
 	void change_focus();
-	std::shared_ptr<sf::View> get_view() const;
+	void set_focus(bool is_focused);
 	void process_events(const std::shared_ptr<sf::Event>& event);
 
 private:
@@ -32,9 +32,8 @@ private:
 	static constexpr float walking_speed = 1.1f;
 	bool is_focused_ = false;
 	sf::Vector2<bool> view_centered_ = { false, false };
-	std::shared_ptr<sf::View> p_view_;
-	float amount_to_move_view_ = 3.f;
-	int error_rate_position_ = 2;
+	const float amount_to_move_view_ = 3.f;
+	const int error_rate_position_ = 2;
 
 public:
 	enum class animation_index
@@ -74,6 +73,6 @@ private:
 	int number_of_frames_ = 7;
 	float hold_time_ = 0.1f;
 
-	std::shared_ptr<ge::game_data> data_;
+	std::shared_ptr<ge::game_context> data_;
 };
 

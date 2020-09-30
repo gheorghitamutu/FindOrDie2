@@ -158,8 +158,10 @@
   <ItemGroup>
     <ClInclude Include="Animation.hpp" />
     <ClInclude Include="AssetManager.hpp" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="DEFINITIONS.hpp" />
     <ClInclude Include="Game.hpp" />
+    <ClInclude Include="GameContext.hpp" />
     <ClInclude Include="GameState.hpp" />
     <ClInclude Include="InputManager.hpp" />
     <ClInclude Include="MainMenuState.hpp" />
@@ -175,6 +177,8 @@
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="AssetManager.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="GameContext.cpp" />
     <ClCompile Include="GameState.cpp" />
     <ClCompile Include="MainMenuState.cpp" />
     <ClCompile Include="PauseState.cpp" />

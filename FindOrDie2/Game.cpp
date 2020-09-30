@@ -6,15 +6,11 @@ namespace ge
 {
 	game::game() noexcept
 	{
-		data_->window.reset(		
-				new sf::RenderWindow(
-				sf::VideoMode(sf::VideoMode::getFullscreenModes()[0]),
-				sf::String(GAME_TITLE),
-				sf::Style::Close | sf::Style::Titlebar));
+		data_ = std::make_shared<game_context>(game_context());
 
-		data_->machine->add_state(std::make_shared<splash_state>(splash_state(data_)));
+		data_->machine_->add_state(std::make_shared<splash_state>(splash_state(data_)));
 
-		data_->window->setFramerateLimit(max_fps_);
+		data_->render_window_->setFramerateLimit(max_fps_);
 
 		run();
 	}
@@ -24,9 +20,9 @@ namespace ge
 		auto current_time = clock_.getElapsedTime().asSeconds();
 		auto accumulator = 0.0f;
 
-		while (data_->window->isOpen())
+		while (data_->render_window_->isOpen())
 		{
-			data_->machine->process_state_changes();
+			data_->machine_->process_state_changes();
 
 			// calculate time between events
 			const auto new_time = clock_.getElapsedTime().asSeconds();
@@ -37,13 +33,13 @@ namespace ge
 
 			while (accumulator >= delta_time_)
 			{
-				data_->machine->get_active_state()->handle_input();
-				data_->machine->get_active_state()->update(delta_time_);
+				data_->machine_->get_active_state()->handle_input();
+				data_->machine_->get_active_state()->update(delta_time_);
 
 				accumulator = std::max(accumulator -= delta_time_, 0.0f);
 			}
 
-			data_->machine->get_active_state()->draw();
+			data_->machine_->get_active_state()->draw();
 		}
 	}
 }

@@ -10,7 +10,7 @@ namespace ge
 	class pause_state : public state
 	{
 	public:
-		explicit pause_state(std::shared_ptr<game_data> data);
+		explicit pause_state(std::shared_ptr<game_context> data);
 
 		pause_state(const pause_state& other) = default;
 		pause_state(pause_state&& other) noexcept = default;
@@ -29,7 +29,7 @@ namespace ge
 		void resume() override;
 
 	private:
-		std::shared_ptr<game_data> data_;
+		std::shared_ptr<game_context> data_;
 
 		sf::Clock clock_;
 

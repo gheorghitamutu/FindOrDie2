@@ -9,27 +9,10 @@
 #include "StateMachine.hpp"
 #include "AssetManager.hpp"
 #include "InputManager.hpp"
+#include "Camera.hpp"
 
 namespace ge
 {
-	struct game_data
-	{
-		std::shared_ptr<state_machine> machine = std::make_shared<state_machine>(state_machine());
-		std::unique_ptr<sf::RenderWindow> window;
-		std::shared_ptr<asset_manager> assets = std::make_shared<asset_manager>(asset_manager());
-		std::shared_ptr<input_manager> input = std::make_shared<input_manager>(input_manager());
-
-		game_data() = default;
-
-		game_data(const game_data& other) = delete;
-		game_data(game_data&& other) noexcept = default;
-		explicit game_data(game_data* other) {};
-		game_data& operator=(const game_data& other) = delete;
-		game_data& operator=(game_data&& other) noexcept = delete;
-
-		~game_data() = default;
-	};
-
 	enum class game_progress
 	{
 		playing,
@@ -62,7 +45,7 @@ namespace ge
 
 		sf::Clock clock_;
 
-		std::shared_ptr<game_data> data_ = std::make_shared<game_data>(game_data());
+		std::shared_ptr<game_context> data_;
 	};
 }
 

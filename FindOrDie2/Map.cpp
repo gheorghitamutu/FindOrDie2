@@ -2,9 +2,10 @@
 
 #include "Map.hpp"
 
-map::map(std::shared_ptr<ge::asset_manager> assets) noexcept :
-	assets_(std::move(assets))
+map::map(const std::shared_ptr<ge::game_context>& data) noexcept :
+	data_(data)
 {
+	tiles_.reserve(1024);
 }
 
 map::map(map* other)
@@ -13,9 +14,11 @@ map::map(map* other)
 
 ge::key map::get_key(const sf::Vector2f coords) const
 {
+	const auto view_size = data_->camera_->get_current_view()->getSize();
+
 	float x_key = 0;
 
-	if (view_size_.x != 0)
+	if (view_size.x != 0)
 	{
 		x_key = coords.x / block_size_.x;
 
@@ -31,7 +34,7 @@ ge::key map::get_key(const sf::Vector2f coords) const
 
 	float y_key = 0;
 
-	if (view_size_.y != 0)
+	if (view_size.y != 0)
 	{
 		y_key = coords.y / block_size_.y;
 
@@ -119,6 +122,8 @@ std::vector<ge::key> map::get_neighbors(const ge::key key, const unsigned int le
 
 void map::generate_map()
 {
+	set_tiles_in_view();
+
 	for (auto i = 0U; i < matrix_tile_size_; i++)
 	{
 		for (auto j = 0U; j < matrix_tile_size_; j++)
@@ -129,7 +134,7 @@ void map::generate_map()
 					rock_solid,
 					visible,
 					land,
-					assets_));
+					data_->asset_manager_));
 
 			this_tile->get_body()->setOrigin({
 					static_cast<float>(tile_size_) / 2.f,
@@ -150,18 +155,34 @@ void map::generate_map()
 			tile_blocks_[tile_chunk_position]->emplace_back(this_tile);
 		}
 	}
+
+	for (const auto& tile : tile_blocks_)
+	{
+		std::wcout << L"TileBlock [" << tile.first.x << ", " << tile.first.y << "] contains #" <<
+			tile.second->get_tiles()->get()->size() << " tiles!" << std::endl;
+	}
 }
 
-void map::draw(const std::unique_ptr<sf::RenderWindow>& p_window)
+void map::draw()
 {
-	const auto view_center = p_current_view_->getCenter();
+	// draw the sorted tiles
+	for (const auto& tile : tiles_)
+	{
+		data_->render_window_->draw(*tile->get_body());
+	}
+}
+
+void map::update()
+{
+	tiles_.clear();
+
+	const auto view_center = data_->camera_->get_current_view()->getCenter();
 
 	const auto chunk_position = get_key(view_center);
 
-	const auto chunk_identifiers = get_neighbors(chunk_position, 2);
+	const auto chunk_identifiers = get_neighbors(chunk_position, neighbors_count_);
 
-	// you get all tiles from all blocks in the view center into one vector of tiles
-	std::vector<std::shared_ptr<tile>> tiles;
+	// you get all tiles from all blocks in the view center into one vector of tiles	
 
 	for (const auto& chunk_id : chunk_identifiers)
 	{
@@ -170,12 +191,12 @@ void map::draw(const std::unique_ptr<sf::RenderWindow>& p_window)
 		if (tile_block != tile_blocks_.end())
 		{
 			const auto block_tiles = tile_block->second->get_tiles();
-			tiles.insert(tiles.end(), block_tiles->get()->begin(), block_tiles->get()->end());
+			tiles_.insert(tiles_.end(), block_tiles->get()->begin(), block_tiles->get()->end());
 		}
 	}
 
 	// then you sort the tiles in order to draw them isometric and not overlap them
-	std::sort(tiles.begin(), tiles.end(), [&](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
+	std::sort(tiles_.begin(), tiles_.end(), [&](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
 		{
 			const auto a_pos = a->get_body()->getPosition();
 			const auto b_pos = b->get_body()->getPosition();
@@ -183,30 +204,27 @@ void map::draw(const std::unique_ptr<sf::RenderWindow>& p_window)
 			return a_pos.y == b_pos.y ? a_pos.x > b_pos.x : a_pos.y < b_pos.y;
 		});
 
-	// draw the sorted tiles
-	for (const auto& tile : tiles)
-	{
-		p_window->draw(*tile->get_body());
-	}
+	std::wcout << "Drawing #" << tiles_.size() << " tiles!" << std::endl;
 }
 
-void map::set_view(const std::shared_ptr<sf::View>& p_view)
+void map::set_tiles_in_view()
 {
-	p_current_view_ = p_view;
-
-	view_size_ = p_current_view_->getSize();
+	const auto view_size = data_->camera_->get_current_view()->getSize();
 
 	// tiles contained by a block relative to view size and tile size
 	block_max_tiles_ =
 	{
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / tile_size_ / 2),
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.y / tile_size_ / 2)
+		(view_size.x == 0) ? 0 : static_cast<int>(view_size.x / tile_size_ / tile_factor_),
+		(view_size.x == 0) ? 0 : static_cast<int>(view_size.y / tile_size_ / tile_factor_)
 	};
 
 	// block size relative to view size (1/4 view size)
 	block_size_ =
 	{
-		(view_size_.x == 0) ? 0 : static_cast<int>(view_size_.x / 2),
-		(view_size_.y == 0) ? 0 : static_cast<int>(view_size_.y / 2)
+		(view_size.x == 0) ? 0 : static_cast<int>(view_size.x / tile_factor_),
+		(view_size.y == 0) ? 0 : static_cast<int>(view_size.y / tile_factor_)
 	};
+
+	std::wcout << "Max tiles on block #[" << block_max_tiles_.x << ", " << block_max_tiles_.y << "]" << std::endl;
+	std::wcout << "Max block size #[" << block_size_.x << ", " << block_size_.y << "]" << std::endl;
 }

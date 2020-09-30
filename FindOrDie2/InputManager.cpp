@@ -25,7 +25,7 @@ namespace ge
 
 		return false;
 	}
-	bool input_manager::is_sprite_clicked(sf::Sprite& object, const sf::Mouse::Button button, const std::unique_ptr<sf::RenderWindow>& p_window) const
+	bool input_manager::is_sprite_clicked(sf::Sprite& object, const sf::Mouse::Button button, const std::shared_ptr<sf::RenderWindow>& p_window) const
 	{
 		if (sf::Mouse::isButtonPressed(button))
 		{

@@ -6,8 +6,8 @@
 
 #include "SFML/Graphics.hpp"
 
-#include "AssetManager.hpp"
 #include "TileBlock.hpp"
+#include "GameContext.hpp"
 
 namespace ge
 {
@@ -46,7 +46,7 @@ namespace std
 class map
 {
 public:
-	explicit map(std::shared_ptr<ge::asset_manager> assets) noexcept;
+	explicit map(const std::shared_ptr<ge::game_context>& data) noexcept;
 
 	map(const map& other) = default;
 	map(map&& other) noexcept = default;
@@ -57,23 +57,26 @@ public:
 	~map() = default;
 
 	void generate_map();
-	void draw(const std::unique_ptr<sf::RenderWindow>& p_window);
-	void set_view(const std::shared_ptr<sf::View>& p_view);
+	void draw();
+	void update();
+	void set_tiles_in_view();
 
 	const unsigned int tile_size_ = 64;
+
+	std::vector<std::shared_ptr<tile>> tiles_;
 
 private:
 	ge::key get_key(sf::Vector2f coords) const;
 	std::vector<ge::key> get_neighbors(ge::key key, unsigned int levels) const;
 
-	std::shared_ptr<sf::View> p_current_view_ ;
 	const unsigned int matrix_tile_size_ = 100;
+	const unsigned int tile_factor_ = 6U;
+	const unsigned int neighbors_count_ = 3U;
+
 	sf::FloatRect view_rect_bounds_;
-	sf::Vector2f view_size_ = { 0.f, 0.f };
 	std::unordered_map <ge::key, std::shared_ptr<tile_block>> tile_blocks_;
 	sf::Vector2<int> block_max_tiles_ = { 0,0 };
-	sf::Vector2<int> block_size_ = { 0,0 };
+	sf::Vector2<int> block_size_ = { 0, 0 };
 
-	std::shared_ptr<ge::asset_manager> assets_;
+	std::shared_ptr<ge::game_context> data_;
 };
-

@@ -10,7 +10,7 @@ namespace ge
 	class main_menu_state : public state
 	{
 	public:
-		explicit main_menu_state(std::shared_ptr<game_data> data);
+		explicit main_menu_state(std::shared_ptr<game_context> data);
 
 		main_menu_state(const main_menu_state& other) = default;
 		main_menu_state(main_menu_state&& other) noexcept = default;
@@ -29,7 +29,7 @@ namespace ge
 		void pause() override;
 
 	private:
-		std::shared_ptr<game_data> data_;
+		std::shared_ptr<game_context> data_;
 
 		sf::Sprite background_;
 

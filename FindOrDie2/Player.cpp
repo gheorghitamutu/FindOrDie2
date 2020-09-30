@@ -3,21 +3,14 @@
 
 #include <iostream>
 
-player::player(std::shared_ptr<ge::game_data>& data) noexcept :
+player::player(std::shared_ptr<ge::game_context>& data) noexcept :
 	data_(data)
 {
 	body_.setOrigin(texture_size / 2, texture_size / 2);
 	body_.setScale({ 1.0f, 0.5f });
 	body_.setPosition({ 0.0f, 0.0f });
 
-	const auto window_size = data_->window->getSize();
-
-	p_view_ = std::make_shared<sf::View>(sf::View());
-	p_view_->setSize({ static_cast<float>(window_size.x), static_cast<float>(window_size.y) });
-	p_view_->zoom(1.0f);
-	p_view_->setCenter({ 0,0 });
-
-	const auto texture_required = data_->assets->get_texture("Player_Man");
+	const auto texture_required = data_->asset_manager_->get_texture("Player_Man");
 	
 	for (auto i = 0; i < int(animation_index::count); i++)
 	{
@@ -49,7 +42,7 @@ void player::update(const float elapsed_sec)
 	if (is_focused_)
 	{
 		const auto player_position = body_.getPosition();
-		const auto view_position = p_view_->getCenter();
+		const auto view_position = data_->camera_->get_current_view()->getCenter();
 
 		// you try guessing that the new view position will be the player's one
 		auto view_new_position = player_position;
@@ -57,14 +50,16 @@ void player::update(const float elapsed_sec)
 		// the player has the view already centered on him
 		if (view_centered_.x && view_centered_.y)
 		{
-			p_view_->setCenter(player_position);
+			data_->camera_->get_current_view()->setCenter(player_position);
 		}
 		else // the view is not centered on the player
 		{
-			auto delta_distance = player_position - view_position;
-			delta_distance.x = abs(delta_distance.x);
-			delta_distance.y = abs(delta_distance.y);
-
+			const sf::Vector2f delta_distance =
+			{
+				abs(player_position.x - view_position.x),
+				abs(player_position.y - view_position.y)
+			};
+			
 			// the distance from the view center to the player can be neglected
 			if (delta_distance.x < error_rate_position_ && delta_distance.y < error_rate_position_)
 			{
@@ -76,17 +71,25 @@ void player::update(const float elapsed_sec)
 				if (delta_distance.x > error_rate_position_) // x axis is too big
 				{
 					if (static_cast<int>(view_position.x) > static_cast<int>(player_position.x))
+					{
 						view_new_position.x = view_position.x - amount_to_move_view_;
+					}
 					else if (static_cast<int>(view_position.x) < static_cast<int>(player_position.x))
+					{
 						view_new_position.x = view_position.x + amount_to_move_view_;
+					}
 				}
 
 				if (delta_distance.y > error_rate_position_) // y axis is too big
 				{
 					if (static_cast<int>(view_position.y) > static_cast<int>(player_position.y))
+					{
 						view_new_position.y = view_position.y - amount_to_move_view_;
+					}
 					else if (static_cast<int>(view_position.y) < static_cast<int>(player_position.y))
+					{
 						view_new_position.y = view_position.y + amount_to_move_view_;
+					}
 				}
 
 				// so the view is not yet centered on the player
@@ -94,15 +97,15 @@ void player::update(const float elapsed_sec)
 			}
 
 			// correct the view center bringing it close to the player
-			p_view_->setCenter(view_new_position);
+			data_->camera_->get_current_view()->setCenter(view_new_position);
 		}
 	}
 }
 
-void player::draw(const std::unique_ptr<sf::RenderWindow>& p_window) const
+void player::draw() const
 {
-	const auto view_center = p_view_->getCenter();
-	const auto view_size = p_view_->getSize();
+	const auto view_center = data_->camera_->get_current_view()->getCenter();
+	const auto view_size = data_->camera_->get_current_view()->getSize();
 
 	sf::FloatRect rect_bounds;
 	rect_bounds.left = view_center.x - view_size.x / 2.f;
@@ -112,7 +115,7 @@ void player::draw(const std::unique_ptr<sf::RenderWindow>& p_window) const
 
 	if (body_.getGlobalBounds().intersects(rect_bounds))
 	{
-		p_window->draw(body_);
+		data_->render_window_->draw(body_);
 	}
 }
 
@@ -126,28 +129,28 @@ void player::change_focus()
 	is_focused_ = !is_focused_;
 }
 
-std::shared_ptr<sf::View> player::get_view() const
+void player::set_focus(bool is_focused)
 {
-	return p_view_;
+	is_focused_ = is_focused;
 }
 
 void player::process_events(const std::shared_ptr<sf::Event>& event)
 {
 	direction_ = { 0, 0 };
 
-	if (data_->input->is_key_pressed(ge::input_keys::up))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::up))
 	{
 		direction_.y = -1;
 	}
-	if (data_->input->is_key_pressed(ge::input_keys::down))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.y = 1;
 	}
-	if (data_->input->is_key_pressed(ge::input_keys::left))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = -1;
 	}
-	if (data_->input->is_key_pressed(ge::input_keys::right))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::right))
 	{
 		direction_.x = 1;
 	}
@@ -158,21 +161,21 @@ void player::process_events(const std::shared_ptr<sf::Event>& event)
 		direction_.y *= 2;
 	}
 
-	if (data_->input->is_key_pressed(ge::input_keys::right) &&
-		data_->input->is_key_pressed(ge::input_keys::left))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::right) &&
+		data_->input_manager_->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (data_->input->is_key_pressed(ge::input_keys::up) &&
-		data_->input->is_key_pressed(ge::input_keys::down))
+	if (data_->input_manager_->is_key_pressed(ge::input_keys::up) &&
+		data_->input_manager_->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (data_->input->is_key_released(ge::input_keys::c, event))
+	if (data_->input_manager_->is_key_released(ge::input_keys::c, event))
 	{
 		is_focused_ = !is_focused_;
 	}
