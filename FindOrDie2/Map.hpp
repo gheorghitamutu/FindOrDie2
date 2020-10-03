@@ -79,4 +79,7 @@ private:
 	sf::Vector2<int> block_size_ = { 0, 0 };
 
 	std::shared_ptr<ge::game_context> data_;
+
+	int get_quadrant(const sf::Vector2f& p);
+	double get_clockwise_angle(const sf::Vector2f& center, const sf::Vector2f& p);
 };

@@ -142,7 +142,7 @@ void map::generate_map()
 
 			// flat surface formula
 			const float tile_position_x = j * static_cast<float>(tile_size_) / 2;
-			const float tile_position_y = i * static_cast<float>(tile_size_) / 4 + j * static_cast<float>(tile_size_) / 4;
+			const float tile_position_y = i * static_cast<float>(tile_size_) / 2 + j * static_cast<float>(tile_size_) / 4;
 			this_tile->get_body()->setPosition({ tile_position_x,  tile_position_y });
 
 			const ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y });
@@ -160,6 +160,30 @@ void map::generate_map()
 	{
 		std::wcout << L"TileBlock [" << tile.first.x << ", " << tile.first.y << "] contains #" <<
 			tile.second->get_tiles()->get()->size() << " tiles!" << std::endl;
+	}
+
+	std::cout << std::endl;
+
+	std::vector<ge::key> keys;
+	for (const auto& tile : tile_blocks_)
+	{
+		keys.emplace_back(tile.first);
+	}
+
+	for (const auto& key : keys)
+	{
+		const auto block_tiles = tile_blocks_[key]->get_tiles();
+
+		std::wcout << L"TileBlock [" << key.x << ", " << key.y << "] contains #" <<
+			block_tiles->get()->size() << " tiles!" << std::endl;
+
+		std::vector<std::shared_ptr<tile>> tiles;
+		tiles.insert(tiles.end(), block_tiles->get()->begin(), block_tiles->get()->end());
+		for (const auto& tile : tiles)
+		{
+			const auto p = tile->get_body()->getPosition();
+			std::wcout << L"X: " << p.x << L" Y: " << p.y << std::endl;
+		}
 	}
 }
 
@@ -196,15 +220,57 @@ void map::update()
 	}
 
 	// then you sort the tiles in order to draw them isometric and not overlap them
-	std::sort(tiles_.begin(), tiles_.end(), [&](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
+	const auto my_sorting = [&](std::vector<std::shared_ptr<tile>>& tiles)
+	{
+		std::sort(tiles.begin(), tiles.end(), [&](const std::shared_ptr<tile> a, const std::shared_ptr<tile> b)
+			{
+				const auto a_pos = a->get_body()->getPosition();
+				const auto b_pos = b->get_body()->getPosition();
+				const auto camera_center = data_->camera_->get_current_view()->getCenter();
+
+				// return (get_clockwise_angle(camera_center, a_pos) > get_clockwise_angle(camera_center, b_pos));
+				return a_pos.y == b_pos.y ? a_pos.x > b_pos.x : a_pos.y < b_pos.y;
+			});
+	};
+
+	// std::wcout << "Drawing #" << tiles_.size() << " tiles!" << std::endl;
+
+	std::vector<std::shared_ptr<tile>> tiles_4;
+	std::vector<std::shared_ptr<tile>> tiles_3;
+	std::vector<std::shared_ptr<tile>> tiles_2;
+	std::vector<std::shared_ptr<tile>> tiles_1;
+
+	const auto camera_center = data_->camera_->get_current_view()->getCenter();
+	for (const auto& tile : tiles_) 
+	{
+		const sf::Vector2f relative_point = tile->get_body()->getPosition() - camera_center;
+		switch (get_quadrant(relative_point))
 		{
-			const auto a_pos = a->get_body()->getPosition();
-			const auto b_pos = b->get_body()->getPosition();
+			case 1: tiles_1.emplace_back(tile); break;
+			case 2: tiles_2.emplace_back(tile); break;
+			case 3: tiles_3.emplace_back(tile); break;
+			case 4: tiles_4.emplace_back(tile); break;
+		}
+	}
 
-			return a_pos.y == b_pos.y ? a_pos.x > b_pos.x : a_pos.y < b_pos.y;
-		});
+	// my_sorting(tiles_1);
+	// my_sorting(tiles_2);
+	// my_sorting(tiles_3);
+	// my_sorting(tiles_4);
+	// 
+	// tiles_.clear();
+	// 
+	// const auto my_insert = [&](std::vector<std::shared_ptr<tile>>& tiles)
+	// {
+	// 	tiles_.insert(tiles_.end(), tiles.begin(), tiles.end());
+	// };
+	// 
+	// my_insert(tiles_4);
+	// my_insert(tiles_3);
+	// my_insert(tiles_2);
+	// my_insert(tiles_1);
 
-	std::wcout << "Drawing #" << tiles_.size() << " tiles!" << std::endl;
+	my_sorting(tiles_);
 }
 
 void map::set_tiles_in_view()
@@ -227,4 +293,30 @@ void map::set_tiles_in_view()
 
 	std::wcout << "Max tiles on block #[" << block_max_tiles_.x << ", " << block_max_tiles_.y << "]" << std::endl;
 	std::wcout << "Max block size #[" << block_size_.x << ", " << block_size_.y << "]" << std::endl;
+}
+
+int map::get_quadrant(const sf::Vector2f& p)
+{
+	int result = 4; //origin
+
+	if (p.x > 0 && p.y > 0)
+		return 1;
+	else if (p.x < 0 && p.y > 0)
+		return 2;
+	else if (p.x < 0 && p.y < 0)
+		return 3;
+	//else 4th quadrant
+	return result;
+}
+
+double map::get_clockwise_angle(const sf::Vector2f& center, const sf::Vector2f& p)
+{
+	const sf::Vector2f relative_point = p - center;
+
+	double angle = 0.0;
+	int quadrant = get_quadrant(relative_point);
+
+	/*calculate angle and return it*/
+	angle = -atan2(relative_point.x, -relative_point.y);
+	return angle;
 }
