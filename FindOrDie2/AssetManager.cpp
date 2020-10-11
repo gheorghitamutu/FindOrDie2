@@ -4,9 +4,10 @@ namespace ge
 {
 	asset_manager::asset_manager()
 	{
-		load_texture("Ghost",		"Resources/Sprites/ghost.png");
-		load_texture("Player_Man",	"Resources/Sprites/Player_Man/man.png");
-		load_texture("Full_Block",	"Resources/Sprites/Tiles/block (1) modified 64x64.png");
+		load_texture("Ghost",			 "Resources/Sprites/ghost.png");
+		load_texture("Player_Man",		 "Resources/Sprites/Player_Man/man.png");
+		load_texture("Full_Block_Green", "Resources/Sprites/Tiles/block (1) modified 64x64.png");
+		load_texture("Full_Block_Brown", "Resources/Sprites/Tiles/block (5) modified 64x64.png");
 	}
 
 	void asset_manager::load_texture(const std::string& name, const std::string& file_name)

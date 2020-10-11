@@ -63,6 +63,11 @@ public:
 
 	const unsigned int tile_size_ = 64;
 
+	const float half_tile_ = static_cast<float>(tile_size_) / 2;
+	const float quarter_tile_ = static_cast<float>(tile_size_) / 4;
+
+	const sf::Vector2f tile_origin_{ half_tile_, half_tile_ };
+
 	std::vector<std::shared_ptr<tile>> tiles_;
 
 private:
@@ -70,6 +75,7 @@ private:
 	std::vector<ge::key> get_neighbors(ge::key key, unsigned int levels) const;
 
 	const unsigned int matrix_tile_size_ = 100;
+	const unsigned int levels_count_ = 2;
 	const unsigned int tile_factor_ = 6U;
 	const unsigned int neighbors_count_ = 3U;
 
@@ -80,6 +86,8 @@ private:
 
 	std::shared_ptr<ge::game_context> data_;
 
-	int get_quadrant(const sf::Vector2f& p);
-	double get_clockwise_angle(const sf::Vector2f& center, const sf::Vector2f& p);
+	const std::map<const unsigned int, const std::string> levels_ = {
+		{ 0, "Full_Block_Green" },
+		{ 1, "Full_Block_Brown" }
+	};
 };

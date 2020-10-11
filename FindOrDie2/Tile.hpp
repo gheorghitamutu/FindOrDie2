@@ -16,7 +16,8 @@ enum tile_type
 enum tile_appearance
 {
 	visible,
-	invisible
+	invisible,
+	transparent
 };
 
 enum tile_usage
@@ -29,7 +30,8 @@ class tile
 {
 public:
 	tile(const std::string& name, tile_type type, tile_appearance appearance, 
-		tile_usage usage, const std::shared_ptr<ge::asset_manager>& assets);
+		tile_usage usage, const unsigned int tile_level, 
+		const std::shared_ptr<ge::asset_manager>& assets);
 	
 	tile(const tile& other) = default;
 	tile(tile&& other) noexcept = default;
@@ -42,6 +44,8 @@ public:
 	std::shared_ptr<sf::Sprite> get_body() const;
 	bool is_visible() const;
 
+	void set_tile_level(const unsigned int tile_level);
+	const unsigned int get_tile_level() const;
 private:
 	std::shared_ptr<sf::Sprite> body_;
 	std::vector<float> collision_points_;
@@ -49,5 +53,7 @@ private:
 	tile_type type_ = rock_solid;
 	tile_appearance appearance_ = visible;
 	tile_usage usage_ = land;
+
+	unsigned int tile_level_ = 0;
 };
 
