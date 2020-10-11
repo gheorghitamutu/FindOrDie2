@@ -1,10 +1,4 @@
-#include <memory>
-#include <iostream>
-#include <utility>
-
 #include "SplashState.hpp"
-#include "DEFINITIONS.hpp"
-#include "MainMenuState.hpp"
 
 namespace ge
 {

@@ -1,13 +1,8 @@
-#include <iostream>
-#include <utility>
-
 #include "MainMenuState.hpp"
-#include "DEFINITIONS.hpp"
-#include "GameState.hpp"
 
 namespace ge
 {
-	main_menu_state::main_menu_state(std::shared_ptr<game_context> data) :
+	main_menu_state::main_menu_state(std::shared_ptr<game_context>& data) : 
 		data_(data)
 	{
 	}

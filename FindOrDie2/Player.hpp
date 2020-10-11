@@ -3,12 +3,13 @@
 #include <SFML/Graphics.hpp>
 
 #include "Animation.hpp"
-#include "Game.hpp"
+#include "Camera.hpp"
+#include "InputManager.hpp"
 
 class player
 {
 public:
-	player(std::shared_ptr<ge::game_context>& data) noexcept;
+	player(const std::shared_ptr<sf::Texture>& texture) noexcept;
 
 	player(const player& other) = default;
 	player(player&& other) noexcept = default;
@@ -17,12 +18,12 @@ public:
 
 	~player() = default;
 
-	void update(float elapsed_sec);
-	void draw() const;
+	void update(float elapsed_sec, std::shared_ptr<camera>& camera);
+	void draw(std::shared_ptr<camera>& camera, std::shared_ptr<sf::RenderWindow>& window) const;
 	sf::Vector2f get_position() const;
 	void change_focus();
 	void set_focus(bool is_focused);
-	void process_events(const std::shared_ptr<sf::Event>& event);
+	void process_events(const std::shared_ptr<sf::Event>& event, std::shared_ptr<ge::input_manager> input_manager);
 
 private:
 	sf::Sprite body_;
@@ -72,7 +73,5 @@ private:
 	animation_index current_animation_ = animation_index::idle_south;
 	int number_of_frames_ = 7;
 	float hold_time_ = 0.1f;
-
-	std::shared_ptr<ge::game_context> data_;
 };
 

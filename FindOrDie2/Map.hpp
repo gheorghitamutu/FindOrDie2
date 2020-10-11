@@ -3,11 +3,14 @@
 #include <vector>
 #include <unordered_map>
 #include <future>
+#include <iostream>
+#include <algorithm>
 
 #include "SFML/Graphics.hpp"
 
 #include "TileBlock.hpp"
-#include "GameContext.hpp"
+#include "Camera.hpp"
+#include "AssetManager.hpp"
 
 namespace ge
 {
@@ -46,7 +49,7 @@ namespace std
 class map
 {
 public:
-	explicit map(const std::shared_ptr<ge::game_context>& data) noexcept;
+	explicit map() noexcept;
 
 	map(const map& other) = default;
 	map(map&& other) noexcept = default;
@@ -56,10 +59,10 @@ public:
 
 	~map() = default;
 
-	void generate_map();
-	void draw();
-	void update();
-	void set_tiles_in_view();
+	void generate_map(const std::shared_ptr<ge::asset_manager>& asset_manager, const std::shared_ptr<camera>& camera);
+	void draw(const std::shared_ptr<sf::RenderWindow>& render_window);
+	void update(const std::shared_ptr<camera>& camera, const sf::Vector2f player_position);
+	void set_tiles_in_view(const std::shared_ptr<camera>& camera);
 
 	const unsigned int tile_size_ = 64;
 
@@ -71,7 +74,7 @@ public:
 	std::vector<std::shared_ptr<tile>> tiles_;
 
 private:
-	ge::key get_key(sf::Vector2f coords) const;
+	ge::key get_key(sf::Vector2f coords, const std::shared_ptr<camera>& camera) const;
 	std::vector<ge::key> get_neighbors(ge::key key, unsigned int levels) const;
 
 	const unsigned int matrix_tile_size_ = 100;
@@ -84,10 +87,11 @@ private:
 	sf::Vector2<int> block_max_tiles_ = { 0,0 };
 	sf::Vector2<int> block_size_ = { 0, 0 };
 
-	std::shared_ptr<ge::game_context> data_;
-
 	const std::map<const unsigned int, const std::string> levels_ = {
 		{ 0, "Full_Block_Green" },
 		{ 1, "Full_Block_Brown" }
 	};
+
+	const sf::Color transparent_ = sf::Color(255, 255, 255, 80);
+	const sf::Color full_color_ = sf::Color(255, 255, 255, 255);
 };

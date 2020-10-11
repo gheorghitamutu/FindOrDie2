@@ -23,3 +23,15 @@ constexpr const char* const MAIN_MENU_RESUME_BUTTON = MAIN_MENU_PLAY_BUTTON;
 constexpr const char* const MAIN_MENU_RESUME_BUTTON_TEXT = "Resume";
 constexpr const char* const MAIN_MENU_SAVE_BUTTON = MAIN_MENU_SETTINGS_BUTTON;
 constexpr const char* const MAIN_MENU_SAVE_BUTTON_TEXT = "Save";
+
+namespace ge
+{
+	enum class game_progress
+	{
+		playing,
+		pause,
+		won,
+		lose,
+		draw
+	};
+}

@@ -1,20 +1,17 @@
 #include "Tile.hpp"
 
-tile::tile(const std::string& name, const tile_type type, const tile_appearance appearance,
-           const tile_usage usage, const unsigned int tile_level,
-		   const std::shared_ptr<ge::asset_manager>& assets) :
+tile::tile(const std::shared_ptr<sf::Texture>& texture, const tile_type type, const tile_appearance appearance,
+           const tile_usage usage, const unsigned int tile_level) :
 	type_(type),
 	appearance_(appearance),
 	usage_(usage),
 	tile_level_(tile_level)
 {
 	body_ = std::make_shared<sf::Sprite>(sf::Sprite());
-
-	const auto body_texture = assets->get_texture(name);
-	
-	if (body_texture != nullptr)
+		
+	if (texture != nullptr)
 	{
-		body_->setTexture(*body_texture);
+		body_->setTexture(*texture);
 	}
 	else
 	{
@@ -23,34 +20,34 @@ tile::tile(const std::string& name, const tile_type type, const tile_appearance 
 
 	switch (type_)
 	{
-	case rock_solid:
+	case tile_type::rock_solid:
 		switch (usage_)
 		{
-		case land:
+		case tile_usage::land:
 			break;
-		case wall:
+		case tile_usage::wall:
 			break;
 		default:
 			break;
 		}
 		break;
-	case liquid:
+	case tile_type::liquid:
 		switch (usage_)
 		{
-		case land:
+		case tile_usage::land:
 			break;
-		case wall:
+		case tile_usage::wall:
 			break;
 		default:
 			break;
 		}
 		break;
-	case gas:
+	case tile_type::gas:
 		switch (usage_)
 		{
-		case land:
+		case tile_usage::land:
 			break;
-		case wall:
+		case tile_usage::wall:
 			break;
 		default:
 			break;
@@ -72,7 +69,7 @@ std::shared_ptr<sf::Sprite> tile::get_body() const
 
 bool tile::is_visible() const
 {
-	return appearance_ == visible;
+	return appearance_ == tile_appearance::visible;
 }
 
 void tile::set_tile_level(const unsigned int tile_level)
@@ -83,4 +80,9 @@ void tile::set_tile_level(const unsigned int tile_level)
 const unsigned int tile::get_tile_level() const
 {
 	return tile_level_;
+}
+
+const tile_appearance tile::get_tile_appearance() const
+{
+	return appearance_;
 }

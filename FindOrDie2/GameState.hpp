@@ -2,18 +2,16 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "State.hpp"
-#include "Game.hpp"
-#include "Map.hpp"
-#include "Player.hpp"
 #include "GameContext.hpp"
+#include "State.hpp"
+#include "PauseState.hpp"
 
 namespace ge
 {
 	class game_state : public state
 	{
 	public:
-		explicit game_state(std::shared_ptr<game_context> data);
+		explicit game_state(std::shared_ptr<class game_context>& data);
 
 		game_state(const game_state& other) = default;
 		game_state(game_state&& other) noexcept = default;
@@ -34,10 +32,6 @@ namespace ge
 		std::shared_ptr<game_context> data_;
 
 		sf::Clock clock_;
-
-		std::shared_ptr<map> p_map_;
-
-		std::shared_ptr<player> p_player_;
 
 		game_progress game_progress_;
 	};

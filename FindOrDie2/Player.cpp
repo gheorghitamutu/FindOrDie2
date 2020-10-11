@@ -1,32 +1,26 @@
 #include "Player.hpp"
-#include "DEFINITIONS.hpp"
 
-#include <iostream>
-
-player::player(std::shared_ptr<ge::game_context>& data) noexcept :
-	data_(data)
+player::player(const std::shared_ptr<sf::Texture>& texture) noexcept
 {
 	body_.setOrigin(texture_size / 2, texture_size / 2);
 	body_.setScale({ 1.0f, 0.5f });
 	body_.setPosition({ 0.0f, 0.0f });
 
-	const auto texture_required = data_->asset_manager_->get_texture("Player_Man");
-	
 	for (auto i = 0; i < int(animation_index::count); i++)
 	{
 		animations_.emplace_back(
 			animation(
-				static_cast<int>(texture_size), 
-				static_cast<int>(i * texture_size), 
-				static_cast<int>(texture_size), 
-				static_cast<int>(texture_size), 
-				texture_required,
+				static_cast<int>(texture_size),
+				static_cast<int>(i * texture_size),
+				static_cast<int>(texture_size),
+				static_cast<int>(texture_size),
+				texture,
 				number_of_frames_,
 				hold_time_));
 	}
 }
 
-void player::update(const float elapsed_sec)
+void player::update(const float elapsed_sec, std::shared_ptr<camera>& camera)
 {	
 	auto pos = body_.getPosition();
 
@@ -42,7 +36,7 @@ void player::update(const float elapsed_sec)
 	if (is_focused_)
 	{
 		const auto player_position = body_.getPosition();
-		const auto view_position = data_->camera_->get_current_view()->getCenter();
+		const auto view_position = camera->get_current_view()->getCenter();
 
 		// you try guessing that the new view position will be the player's one
 		auto view_new_position = player_position;
@@ -50,7 +44,7 @@ void player::update(const float elapsed_sec)
 		// the player has the view already centered on him
 		if (view_centered_.x && view_centered_.y)
 		{
-			data_->camera_->get_current_view()->setCenter(player_position);
+			camera->get_current_view()->setCenter(player_position);
 		}
 		else // the view is not centered on the player
 		{
@@ -97,15 +91,15 @@ void player::update(const float elapsed_sec)
 			}
 
 			// correct the view center bringing it close to the player
-			data_->camera_->get_current_view()->setCenter(view_new_position);
+			camera->get_current_view()->setCenter(view_new_position);
 		}
 	}
 }
 
-void player::draw() const
+void player::draw(std::shared_ptr<camera>& camera, std::shared_ptr<sf::RenderWindow>& window) const
 {
-	const auto view_center = data_->camera_->get_current_view()->getCenter();
-	const auto view_size = data_->camera_->get_current_view()->getSize();
+	const auto view_center = camera->get_current_view()->getCenter();
+	const auto view_size = camera->get_current_view()->getSize();
 
 	sf::FloatRect rect_bounds;
 	rect_bounds.left = view_center.x - view_size.x / 2.f;
@@ -115,7 +109,7 @@ void player::draw() const
 
 	if (body_.getGlobalBounds().intersects(rect_bounds))
 	{
-		data_->render_window_->draw(body_);
+		window->draw(body_);
 	}
 }
 
@@ -134,23 +128,23 @@ void player::set_focus(bool is_focused)
 	is_focused_ = is_focused;
 }
 
-void player::process_events(const std::shared_ptr<sf::Event>& event)
+void player::process_events(const std::shared_ptr<sf::Event>& event, std::shared_ptr<ge::input_manager> input_manager)
 {
 	direction_ = { 0, 0 };
 
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::up))
+	if (input_manager->is_key_pressed(ge::input_keys::up))
 	{
 		direction_.y = -1;
 	}
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::down))
+	if (input_manager->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.y = 1;
 	}
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::left))
+	if (input_manager->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = -1;
 	}
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::right))
+	if (input_manager->is_key_pressed(ge::input_keys::right))
 	{
 		direction_.x = 1;
 	}
@@ -161,21 +155,21 @@ void player::process_events(const std::shared_ptr<sf::Event>& event)
 		direction_.y *= 2;
 	}
 
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::right) &&
-		data_->input_manager_->is_key_pressed(ge::input_keys::left))
+	if (input_manager->is_key_pressed(ge::input_keys::right) &&
+		input_manager->is_key_pressed(ge::input_keys::left))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (data_->input_manager_->is_key_pressed(ge::input_keys::up) &&
-		data_->input_manager_->is_key_pressed(ge::input_keys::down))
+	if (input_manager->is_key_pressed(ge::input_keys::up) &&
+		input_manager->is_key_pressed(ge::input_keys::down))
 	{
 		direction_.x = 0;
 		direction_.y = 0;
 	}
 
-	if (data_->input_manager_->is_key_released(ge::input_keys::c, event))
+	if (input_manager->is_key_released(ge::input_keys::c, event))
 	{
 		is_focused_ = !is_focused_;
 	}

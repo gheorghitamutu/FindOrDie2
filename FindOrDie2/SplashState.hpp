@@ -1,16 +1,21 @@
 #pragma once
 
+#include <memory>
+#include <iostream>
+#include <utility>
+
+
 #include <SFML/Graphics.hpp>
 
 #include "State.hpp"
-#include "Game.hpp"
+#include "MainMenuState.hpp"
 
 namespace ge
 {
 	class splash_state : public state
 	{
 	public:
-		explicit splash_state(const std::shared_ptr<game_context>& data);
+		explicit splash_state(const std::shared_ptr<class game_context>& data);
 
 		splash_state(const splash_state& other) = default;
 		splash_state(splash_state&& other) noexcept = default;

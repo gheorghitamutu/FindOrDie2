@@ -6,21 +6,21 @@
 
 #include "AssetManager.hpp"
 
-enum tile_type
+enum class tile_type
 {
 	rock_solid,
 	liquid,
 	gas
 };
 
-enum tile_appearance
+enum class tile_appearance
 {
 	visible,
 	invisible,
 	transparent
 };
 
-enum tile_usage
+enum class tile_usage
 {
 	land,
 	wall
@@ -29,9 +29,8 @@ enum tile_usage
 class tile
 {
 public:
-	tile(const std::string& name, tile_type type, tile_appearance appearance, 
-		tile_usage usage, const unsigned int tile_level, 
-		const std::shared_ptr<ge::asset_manager>& assets);
+	tile(const std::shared_ptr<sf::Texture>& texture, tile_type type, tile_appearance appearance,
+		tile_usage usage, const unsigned int tile_level);
 	
 	tile(const tile& other) = default;
 	tile(tile&& other) noexcept = default;
@@ -46,13 +45,15 @@ public:
 
 	void set_tile_level(const unsigned int tile_level);
 	const unsigned int get_tile_level() const;
+
+	const tile_appearance get_tile_appearance() const;
 private:
 	std::shared_ptr<sf::Sprite> body_;
 	std::vector<float> collision_points_;
 
-	tile_type type_ = rock_solid;
-	tile_appearance appearance_ = visible;
-	tile_usage usage_ = land;
+	tile_type type_ = tile_type::rock_solid;
+	tile_appearance appearance_ = tile_appearance::visible;
+	tile_usage usage_ = tile_usage::land;
 
 	unsigned int tile_level_ = 0;
 };

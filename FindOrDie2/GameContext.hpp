@@ -1,12 +1,14 @@
 #pragma once
 
 #include <memory>
+#include <iostream>
 
+#include "DEFINITIONS.hpp"
 #include "StateMachine.hpp"
 #include "AssetManager.hpp"
-#include "InputManager.hpp"
-#include "Camera.hpp"
-#include "DEFINITIONS.hpp"
+#include "Player.hpp"
+#include "Map.hpp"
+#include "SplashState.hpp"
 
 namespace ge
 {
@@ -18,6 +20,8 @@ namespace ge
 		std::shared_ptr<asset_manager> asset_manager_;
 		std::shared_ptr<input_manager> input_manager_;
 		std::shared_ptr<camera> camera_;
+		std::shared_ptr<player> player_;
+		std::shared_ptr<map> map_;
 
 
 		game_context();

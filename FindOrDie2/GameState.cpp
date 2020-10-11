@@ -1,22 +1,15 @@
 #include "GameState.hpp"
-#include "DEFINITIONS.hpp"
-#include "PauseState.hpp"
-
-#include <iostream>
-#include "Player.hpp"
 
 namespace ge
 {
-	game_state::game_state(std::shared_ptr<ge::game_context> data) :
-		data_(data), 
+	game_state::game_state(std::shared_ptr<ge::game_context>& data) :
+		data_(data),
 		game_progress_(game_progress::playing)
 	{
 	}
 
 	void game_state::init()
 	{
-		p_map_ = std::make_shared<map>(map(data_));
-
 		data_->input_manager_->add_action(up, sf::Keyboard::Key::Up);
 		data_->input_manager_->add_action(down, sf::Keyboard::Key::Down);
 		data_->input_manager_->add_action(left, sf::Keyboard::Key::Left);
@@ -30,9 +23,11 @@ namespace ge
 		data_->camera_->zoom(0.0f);
 		data_->camera_->set_current_view_center({ 0,0 });
 
-		p_player_ = std::make_shared<player>(player(data_));
+		const auto player_texture = data_->asset_manager_->get_texture("Player_Man");
+		data_->player_.reset(new player(player_texture));
 
-		p_map_->generate_map();
+		data_->map_.reset(new map());
+		data_->map_->generate_map(data_->asset_manager_, data_->camera_);
 	}
 
 	void game_state::handle_input()
@@ -48,7 +43,7 @@ namespace ge
 			switch (game_progress_)
 			{
 			case game_progress::playing:
-					p_player_->process_events(std::make_shared<sf::Event>(event));
+					data_->player_->process_events(std::make_shared<sf::Event>(event), data_->input_manager_);
 
 					if (data_->input_manager_->is_key_released(esc, std::make_shared<sf::Event>(event)))
 					{
@@ -77,10 +72,10 @@ namespace ge
 		case game_progress::playing:
 			if (data_->camera_->is_camera_dragged())
 			{
-				p_player_->set_focus(false);
+				data_->player_->set_focus(false);
 			}
-			p_player_->update(delta_time);
-			p_map_->update();
+			data_->player_->update(delta_time, data_->camera_);
+			data_->map_->update(data_->camera_, data_->player_->get_position());
 			break;
 		case game_progress::pause:
 			// ...
@@ -97,8 +92,8 @@ namespace ge
 		switch (game_progress_)
 		{
 		case game_progress::playing:
-			p_map_->draw();
-			p_player_->draw();
+			data_->map_->draw(data_->render_window_);
+			data_->player_->draw(data_->camera_, data_->render_window_);
 			break;
 		case game_progress::pause:
 			// ...

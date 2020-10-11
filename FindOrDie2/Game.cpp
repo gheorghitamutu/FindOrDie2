@@ -1,15 +1,11 @@
 #include "Game.hpp"
-#include "SplashState.hpp"
-#include "DEFINITIONS.hpp"
 
 namespace ge
 {
 	game::game() noexcept
 	{
-		data_ = std::make_shared<game_context>(game_context());
-
+		data_.reset(new ge::game_context());
 		data_->machine_->add_state(std::make_shared<splash_state>(splash_state(data_)));
-
 		data_->render_window_->setFramerateLimit(max_fps_);
 
 		run();

@@ -1,16 +1,19 @@
 #pragma once
 
+#include <utility>
+#include <iostream>
+
 #include <SFML/Graphics.hpp>
 
 #include "State.hpp"
-#include "Game.hpp"
+#include "MainMenuState.hpp"
 
 namespace ge
 {
 	class pause_state : public state
 	{
 	public:
-		explicit pause_state(std::shared_ptr<game_context> data);
+		explicit pause_state(const std::shared_ptr<class game_context>& data);
 
 		pause_state(const pause_state& other) = default;
 		pause_state(pause_state&& other) noexcept = default;

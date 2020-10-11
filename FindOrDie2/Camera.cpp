@@ -1,5 +1,5 @@
 #include "Camera.hpp"
-#include <SFML\Graphics.hpp>
+
 
 camera::camera(const std::shared_ptr<sf::RenderWindow>& window) :
 	window_(window),

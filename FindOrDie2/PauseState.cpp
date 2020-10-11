@@ -1,14 +1,9 @@
 #include "PauseState.hpp"
-#include <utility>
-#include "MainMenuState.hpp"
-#include "DEFINITIONS.hpp"
-
-#include <iostream>
 
 namespace ge
 {
-	pause_state::pause_state(std::shared_ptr<game_context> data) :
-		data_(std::move(data))
+	pause_state::pause_state(const std::shared_ptr<game_context>& data) :
+		data_(data)
 	{
 	}
 

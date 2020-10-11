@@ -1,16 +1,19 @@
 #pragma once
 
+#include <iostream>
+#include <utility>
+
 #include <SFML/Graphics.hpp>
 
 #include "State.hpp"
-#include "Game.hpp"
+#include "GameState.hpp"
 
 namespace ge
 {
 	class main_menu_state : public state
 	{
 	public:
-		explicit main_menu_state(std::shared_ptr<game_context> data);
+		explicit main_menu_state(std::shared_ptr<class game_context>& data);
 
 		main_menu_state(const main_menu_state& other) = default;
 		main_menu_state(main_menu_state&& other) noexcept = default;

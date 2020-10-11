@@ -2,8 +2,7 @@
 
 #include "Map.hpp"
 
-map::map(const std::shared_ptr<ge::game_context>& data) noexcept :
-	data_(data)
+map::map() noexcept
 {
 	tiles_.reserve(1024);
 }
@@ -12,9 +11,9 @@ map::map(map* other)
 {
 }
 
-ge::key map::get_key(const sf::Vector2f coords) const
+ge::key map::get_key(const sf::Vector2f coords, const std::shared_ptr<camera>& camera) const
 {
-	const auto view_size = data_->camera_->get_current_view()->getSize();
+	const auto view_size = camera->get_current_view()->getSize();
 
 	float x_key = 0;
 
@@ -120,9 +119,9 @@ std::vector<ge::key> map::get_neighbors(const ge::key key, const unsigned int le
 	return blocks_coords;
 }
 
-void map::generate_map()
+void map::generate_map(const std::shared_ptr<ge::asset_manager>& asset_manager, const std::shared_ptr<camera>& camera)
 {
-	set_tiles_in_view();
+	set_tiles_in_view(camera);
 
 	for (auto l = 0U; l < levels_count_; l++)
 	{
@@ -142,12 +141,11 @@ void map::generate_map()
 
 				const auto this_tile =
 					std::make_shared<tile>(tile(
-						levels_.find(l)->second,
-						rock_solid,
-						visible,
-						land,
-						l,
-						data_->asset_manager_));
+						asset_manager->get_texture(levels_.find(l)->second),
+						tile_type::rock_solid,
+						tile_appearance::visible,
+						tile_usage::land,
+						l));
 
 				this_tile->get_body()->setOrigin(tile_origin_);
 
@@ -156,7 +154,7 @@ void map::generate_map()
 				const float tile_position_y = j * quarter_tile_ + half_tile_ * (i - l);
 				this_tile->get_body()->setPosition({ tile_position_x,  tile_position_y });
 
-				const ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y });
+				const ge::key tile_chunk_position = get_key({ tile_position_x, tile_position_y }, camera);
 
 				auto block_iter = tile_blocks_.find(tile_chunk_position);
 
@@ -171,7 +169,7 @@ void map::generate_map()
 	}
 }
 
-void map::draw()
+void map::draw(const std::shared_ptr<sf::RenderWindow>& render_window)
 {
 	// draw the sorted tiles
 	for (auto l = 0U; l < levels_count_; l++)
@@ -180,19 +178,19 @@ void map::draw()
 		{
 			if (tile->get_tile_level() == l)
 			{
-				data_->render_window_->draw(*tile->get_body());
+				render_window->draw(*tile->get_body());
 			}
 		}
 	}
 }
 
-void map::update()
+void map::update(const std::shared_ptr<camera>& camera, const sf::Vector2f player_position)
 {
 	tiles_.clear();
 
-	const auto view_center = data_->camera_->get_current_view()->getCenter();
+	const auto view_center = camera->get_current_view()->getCenter();
 
-	const auto chunk_position = get_key(view_center);
+	const auto chunk_position = get_key(view_center, camera);
 
 	const auto chunk_identifiers = get_neighbors(chunk_position, neighbors_count_);
 
@@ -206,6 +204,25 @@ void map::update()
 		{
 			const auto block_tiles = tile_block->second->get_tiles();
 			tiles_.insert(tiles_.end(), block_tiles->get()->begin(), block_tiles->get()->end());
+		}
+	}
+
+	for (auto& tile : tiles_)
+	{
+		if (tile->get_tile_level() == 0)
+		{
+			continue;
+		}
+
+		const sf::Vector2f lower_middle = { player_position.x, player_position.y + 7 };
+
+		if (tile->get_body()->getGlobalBounds().contains(lower_middle))
+		{
+			tile->get_body()->setColor(transparent_);
+		}
+		else
+		{
+			tile->get_body()->setColor(full_color_);
 		}
 	}
 
@@ -224,9 +241,9 @@ void map::update()
 	sort_tiles_for_isometric_drawing(tiles_);
 }
 
-void map::set_tiles_in_view()
+void map::set_tiles_in_view(const std::shared_ptr<camera>& camera)
 {
-	const auto view_size = data_->camera_->get_current_view()->getSize();
+	const auto view_size = camera->get_current_view()->getSize();
 
 	// tiles contained by a block relative to view size and tile size
 	block_max_tiles_ =

@@ -5,23 +5,10 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "Map.hpp"
-#include "StateMachine.hpp"
-#include "AssetManager.hpp"
-#include "InputManager.hpp"
-#include "Camera.hpp"
+#include "GameContext.hpp"
 
 namespace ge
 {
-	enum class game_progress
-	{
-		playing,
-		pause,
-		won,
-		lose,
-		draw 
-	};
-
 	class game
 	{
 	public:
